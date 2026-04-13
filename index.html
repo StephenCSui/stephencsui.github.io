@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stephen Suiwinata | ePortfolio</title>
+  <style>
+    :root {
+      --bg: #07101f;
+      --bg2: #0b1730;
+      --panel: rgba(255, 255, 255, 0.04);
+      --panel-strong: rgba(255, 255, 255, 0.05);
+      --line: rgba(255, 255, 255, 0.10);
+      --line-strong: rgba(255, 255, 255, 0.18);
+      --text: #eef3ff;
+      --muted: #b8c4df;
+      --accent: #8cc8ff;
+      --accent-soft: rgba(140, 200, 255, 0.14);
+      --max: 1100px;
+      --content: 980px;
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(140, 200, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      line-height: 1.65;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: var(--content);
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(6, 11, 24, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.2px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 0.96rem;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .hero {
+      padding: 56px 0 42px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-window {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 36px;
+      align-items: center;
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(140, 200, 255, 0.10), rgba(255,255,255,0.02)),
+        var(--panel);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(140, 200, 255, 0.18);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3, h4 {
+      margin-top: 0;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: clamp(2.35rem, 4.2vw, 4.1rem);
+      margin-bottom: 14px;
+      letter-spacing: -0.03em;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.08rem;
+      margin: 0 0 14px;
+      max-width: 62ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line-strong);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      text-decoration: none;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .btn-primary {
+      background: var(--accent-soft);
+      border-color: rgba(140, 200, 255, 0.24);
+    }
+
+    .btn-primary:hover {
+      background: rgba(140, 200, 255, 0.20);
+    }
+
+    .hero-media {
+      display: flex;
+      justify-content: center;
+    }
+
+    .headshot-box {
+      width: 100%;
+      max-width: 330px;
+      min-height: 390px;
+      border-radius: 24px;
+      border: 1px dashed rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--muted);
+      padding: 20px;
+      margin: 0 auto;
+    }
+
+    .headshot-real {
+      width: 100%;
+      max-width: 330px;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 46px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-title {
+      font-size: clamp(1.95rem, 3vw, 3rem);
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-intro {
+      color: var(--muted);
+      margin-bottom: 26px;
+      font-size: 1.05rem;
+      width: 100%;
+      max-width: none;
+    }
+
+    .about-block + .about-block,
+    .reflection-block + .reflection-block,
+    .letter-block + .letter-block {
+      margin-top: 22px;
+    }
+
+    .about-block p,
+    .reflection-block p,
+    .letter-block p,
+    .resume-block p,
+    .resume-block li {
+      font-size: 1.02rem;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 26px 0;
+    }
+
+    .resume-block + .resume-block {
+      margin-top: 28px;
+    }
+
+    .resume-block h3 {
+      font-size: 1.42rem;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .resume-entry + .resume-entry {
+      margin-top: 22px;
+    }
+
+    .entry-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 24px;
+      margin-bottom: 6px;
+    }
+
+    .entry-title {
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .entry-date {
+      color: var(--muted);
+      font-size: 0.98rem;
+      white-space: nowrap;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .entry-subtitle {
+      font-size: 1.02rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .resume-list {
+      margin: 8px 0 0;
+      padding-left: 20px;
+    }
+
+    .resume-list li + li {
+      margin-top: 6px;
+    }
+
+    .skill-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .skill-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .skill-label {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .skill-value {
+      color: var(--text);
+    }
+
+    .internship-summary {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo-link {
+      width: 100%;
+      max-width: 220px;
+      min-height: 140px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed rgba(255,255,255,0.24);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-weight: 700;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .logo-link:hover {
+      text-decoration: none;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .reflection-photo {
+      margin: 26px 0 28px;
+      text-align: center;
+    }
+
+    .reflection-photo .photo-placeholder {
+      width: 100%;
+      max-width: 780px;
+      min-height: 320px;
+      margin: 0 auto;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,0.24);
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--muted);
+      padding: 18px;
+    }
+
+    .reflection-photo img {
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+    }
+
+    .reflection-photo figcaption {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .contact-item {
+      padding: 16px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    footer {
+      padding: 34px 0 60px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero-window {
+        grid-template-columns: 1fr;
+        gap: 26px;
+        padding: 24px;
+      }
+
+      .hero-copy {
+        text-align: center;
+      }
+
+      .lead {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 0;
+      }
+
+      .entry-head,
+      .skill-row,
+      .contact-grid {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .entry-head {
+        gap: 4px;
+      }
+
+      .entry-date {
+        text-align: left;
+        white-space: normal;
+      }
+
+      .headshot-box {
+        min-height: 260px;
+      }
+
+      .reflection-photo .photo-placeholder {
+        min-height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <div class="brand">Stephen Suiwinata</div>
+      <nav class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#resume">Resume</a>
+        <a href="#reflection">Reflection</a>
+        <a href="#cover-letter">Cover Letter</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container">
+        <div class="hero-window">
+          <div class="hero-copy">
+            <div class="eyebrow">ePortfolio</div>
+            <h1>Stephen Suiwinata</h1>
+
+            <p class="lead">
+              Final-year Mechatronic Engineering (Honours) student at the University of Technology Sydney,
+              with a strong interest in robotics, embedded systems, and systems engineering.
+            </p>
+
+            <p class="lead">
+              I enjoy taking complex engineering problems, breaking them into real subsystems,
+              and integrating the software, electronics, and mechanical elements into a reliable final system.
+            </p>
+
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#resume">View Resume</a>
+              <a class="btn" href="#reflection">Internship Reflection</a>
+              <a class="btn" href="mailto:stephenchrissuiwi@gmail.com">Email Me</a>
+              <a class="btn" href="http://www.linkedin.com/in/stephen-suiwinata-652ab028a" target="_blank">LinkedIn</a>
+            </div>
+          </div>
+
+          <div class="hero-media">
+            <div class="headshot-box">
+              Headshot placeholder<br><br>
+              Replace this with your photo
+            </div>
+
+            <!-- Replace the placeholder above with:
+            <img src="headshot.jpg" alt="Portrait of Stephen Suiwinata" class="headshot-real">
+            -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="container">
+        <div class="content">
+          <h2 class="section-title">About Me</h2>
+          <p class="section-intro">
+            My interests sit at the overlap of robotics and systems engineering: sensing, control,
+            embedded decision-making, and building reliable real-world systems.
+          </p>
+
+          <div class="about-block">
+            <h3>Robotics and Embedded Systems</h3>
+            <p>
+              I am especially interested in how intelligence becomes motion through sensing,
+              control, and embedded decision-making that leads to predictable behaviour.
+              I am comfortable working with embedded platforms such as Arduino, STM32,
+              and Raspberry Pi, and I am particularly drawn to projects involving controlled vehicles.
+            </p>
+          </div>
+
+          <div class="about-block">
+            <h3>Systems Thinking</h3>
+            <p>
+              I enjoy structuring projects that involve multiple components and disciplines,
+              then bringing them together into one final working product.
+              I like being the person who keeps the mechanical, electronics, and software pieces aligned.
+            </p>
+          </div>
+
+          <div class="about-block">
+            <h3>Leadership and Delivery</h3>
+            <p>
+              A key experience shaping how I work was my internship, where I led a team delivering a testing feature.
+              That experience made it clear that successful delivery is not purely technical.
+              It also depends on coordination, communication, accountability, and leadership.
+            </p>
+          </div>
+
+          <div class="about-block">
+            <h3>What I Bring</h3>
+            <p>
+              I bring consistent effort and follow-through. When systems get stuck because of integration issues,
+              unclear requirements, or technical blockers, I stay engaged, communicate early,
+              and keep the work moving until the solution is stable.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="resume">
+      <div class="container">
+        <div class="content">
+          <h2 class="section-title">Resume</h2>
+          <p class="section-intro">
+            Education, technical capability, experience, and supporting skills relevant to graduate engineering roles.
+          </p>
+
+          <div class="resume-block">
+            <h3>Professional Summary</h3>
+            <p>
+              Fourth-year Mechatronic Engineering (Honours) student at the University of Technology Sydney (UTS)
+              with hands-on experience integrating software, electronics, and mechanical design. Comfortable
+              working across embedded platforms and engineering tools, and experienced leading teams to deliver
+              practical testing and prototyping outcomes.
+            </p>
+          </div>
+
+          <div class="resume-block">
+            <h3>Education</h3>
+
+            <div class="resume-entry">
+              <div class="entry-head">
+                <div class="entry-title">Bachelor of Engineering (Honours)</div>
+                <div class="entry-date">Feb 2023 – May 2026 (expected)</div>
+              </div>
+              <div class="entry-subtitle">University of Technology Sydney (UTS)</div>
+              <ul class="resume-list">
+                <li>Mechatronic Engineering, focusing on robotics.</li>
+              </ul>
+            </div>
+
+            <div class="resume-entry">
+              <div class="entry-head">
+                <div class="entry-title">Diploma of Engineering</div>
+                <div class="entry-date">July 2022 – Dec 2022</div>
+              </div>
+              <div class="entry-subtitle">UTS College</div>
+              <ul class="resume-list">
+                <li>GPA: 6.2</li>
+                <li>Awarded Diploma to Degree Scholarship.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="resume-block">
+            <h3>Technical Skills</h3>
+
+            <div class="skill-stack">
+              <div class="skill-row">
+                <div class="skill-label">Programming</div>
+                <div class="skill-value">Python, Java, C/C++</div>
+              </div>
+
+              <div class="skill-row">
+                <div class="skill-label">Software</div>
+                <div class="skill-value">AutoCAD, Altium, SolidWorks (certified)</div>
+              </div>
+
+              <div class="skill-row">
+                <div class="skill-label">Tools &amp; Platforms</div>
+                <div class="skill-value">Arduino, STM32, Raspberry Pi</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="resume-block">
+            <h3>Employment</h3>
+
+            <div class="resume-entry">
+              <div class="entry-head">
+                <div class="entry-title">Team Leader</div>
+                <div class="entry-date">Internship Project</div>
+              </div>
+              <div class="entry-subtitle">Optik Consultancy</div>
+              <ul class="resume-list">
+                <li>Led a team to create a testing feature for Nanosonics.</li>
+                <li>Coordinated task allocation, progress tracking, and delivery alignment across the team.</li>
+                <li>Communicated updates and requirements to keep work on schedule.</li>
+              </ul>
+            </div>
+
+            <div class="resume-entry">
+              <div class="entry-head">
+                <div class="entry-title">Customer Service Associate</div>
+                <div class="entry-date">Casual Employment</div>
+              </div>
+              <div class="entry-subtitle">Yoros Seafood Liverpool</div>
+              <ul class="resume-list">
+                <li>Assisted with customer orders while ensuring friendly service.</li>
+                <li>Supported daily tasks including cleaning and restocking.</li>
+                <li>Handled cash and transactions.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="resume-block">
+            <h3>Certifications and Volunteer Experience</h3>
+
+            <div class="resume-entry">
+              <div class="entry-head">
+                <div class="entry-title">Certifications</div>
+                <div class="entry-date">Recent Training</div>
+              </div>
+              <ul class="resume-list">
+                <li>SOLIDWORKS 2024 Essential Training — LinkedIn Learning</li>
+                <li>C++ Essential Training — LinkedIn Learning</li>
+                <li>Learning Linux Command Line — LinkedIn Learning</li>
+              </ul>
+            </div>
+
+            <div class="resume-entry">
+              <div class="entry-head">
+                <div class="entry-title">Special Needs Orphanage Volunteer</div>
+                <div class="entry-date">Volunteer Experience</div>
+              </div>
+              <div class="entry-subtitle">Bukit Sion High School</div>
+              <ul class="resume-list">
+                <li>Distributed meals and snacks to residents.</li>
+                <li>Assisted staff with general cleaning and minor maintenance of facilities.</li>
+                <li>Organised recreational activities to support the mental wellbeing of the children.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="resume-block">
+            <h3>Core Skills</h3>
+            <ul class="resume-list">
+              <li><strong>Adaptability:</strong> Open-minded and growth-oriented, committed to improvement through feedback and learning.</li>
+              <li><strong>Critical Thinking:</strong> Structured and logical in approaching challenges and creating practical solutions.</li>
+              <li><strong>Communication:</strong> Clear and concise in team settings, helping maintain collaboration and shared understanding.</li>
+              <li><strong>Project Management:</strong> Experienced in managing responsibilities within a group to achieve a shared goal.</li>
+            </ul>
+          </div>
+
+          <div class="resume-block">
+            <h3>References</h3>
+            <p>Available upon request.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="reflection">
+      <div class="container">
+        <div class="content">
+          <h2 class="section-title">Internship Reflection</h2>
+          <p class="section-intro">
+            Reflection on my internship experience, what changed in my thinking,
+            and how the experience shaped my professional direction.
+          </p>
+
+          <div class="internship-summary" id="internship-summary">
+            <a class="logo-link" href="#internship-summary">
+              Internship logo<br>placeholder
+            </a>
+
+            <!-- Replace the placeholder above with:
+            <a class="logo-link" href="#internship-summary">
+              <img src="internship-logo.png" alt="Internship logo" style="max-width: 140px; margin: 0 auto;">
+            </a>
+            -->
+
+            <h3>Internship Experience</h3>
+            <p>
+              This section introduces the internship context, the team environment,
+              and the testing feature project. It gives readers a short explanation of the experience
+              before they move into the reflection itself.
+            </p>
+            <p>
+              A short external company or LinkedIn link can sit here later, but the main focus should stay
+              on your role, your contribution, and what you learned.
+            </p>
+          </div>
+
+          <figure class="reflection-photo">
+            <div class="photo-placeholder">
+              Internship photo placeholder 1<br><br>
+              Suggested use: team / company / environment photo
+            </div>
+
+            <!-- Replace the placeholder above with:
+            <img src="internship-photo-1.jpg" alt="Team photo from internship">
+            -->
+
+            <figcaption>Internship team and industry environment.</figcaption>
+          </figure>
+
+          <div class="reflection-block">
+            <h3>Expectations Before the Internship</h3>
+            <p>
+              Before starting my internship, I expected it to feel similar to university group projects.
+              I assumed the main difference would be the topic and the client, but the working style would still be familiar:
+              divide tasks, complete your portion, and the project naturally comes together.
+              I also believed that if I focused on doing my own work well and managing myself,
+              everything else would run smoothly.
+            </p>
+          </div>
+
+          <div class="reflection-block">
+            <h3>What the Experience Was Really Like</h3>
+            <p>
+              The reality was very different and far better than I anticipated. One of the biggest surprises
+              was how social and diverse the experience was. I met many people across the cohort with different
+              backgrounds, skill sets, and ways of thinking, and that variety made the environment both more
+              challenging and more enjoyable.
+            </p>
+            <p>
+              I also did not expect to interact with so many industry experts or experience how much effort
+              is required beyond building the thing. Documentation, approvals, communication cycles,
+              and process checks are part of what makes a project real and deliverable.
+            </p>
+          </div>
+
+          <figure class="reflection-photo">
+            <div class="photo-placeholder">
+              Internship photo placeholder 2<br><br>
+              Suggested use: lab / prototype / working photo
+            </div>
+
+            <!-- Replace the placeholder above with:
+            <img src="internship-photo-2.jpg" alt="Internship lab or prototype photo">
+            -->
+
+            <figcaption>Working in the lab and engaging with the technical side of the internship.</figcaption>
+          </figure>
+
+          <div class="reflection-block">
+            <h3>Most Important Lessons</h3>
+            <p>
+              The most important lessons I learned were about leadership and people management.
+              I realised quickly that a team does not succeed just because individuals are technically capable.
+              People arrive with different strengths, confidence levels, and personalities.
+            </p>
+            <p>
+              A leader’s role is not only to push tasks forward, but to help the team function as a unit and improve over time.
+              I learned that I cannot focus solely on deliverables if I neglect the people doing the work.
+              Building trust, keeping communication open, and understanding what each person needs to perform well
+              directly affects the quality and speed of delivery.
+            </p>
+          </div>
+
+          <div class="reflection-block">
+            <h3>Value I Bring to an Employer</h3>
+            <p>
+              After this workplace experience, my value proposition to an employer is that I bring consistent effort,
+              resilience, and follow-through. During the internship, I demonstrated this by continuing to work through
+              technical blockers instead of giving up, and by maintaining clear communication with the client
+              throughout the process.
+            </p>
+            <p>
+              Even when progress was difficult, I kept the relationship constructive and focused on solutions.
+              By the end, the client acknowledged the effort my team and I made to get the system working,
+              which reinforced the value of persistence and professional communication.
+            </p>
+          </div>
+
+          <figure class="reflection-photo">
+            <div class="photo-placeholder">
+              Internship photo placeholder 3<br><br>
+              Suggested use: showcase / presentation / final outcome photo
+            </div>
+
+            <!-- Replace the placeholder above with:
+            <img src="internship-photo-3.jpg" alt="Internship showcase or final presentation photo">
+            -->
+
+            <figcaption>Showcase or final outcome from the internship experience.</figcaption>
+          </figure>
+
+          <div class="reflection-block">
+            <h3>Future Direction</h3>
+            <p>
+              I see myself growing into leadership-oriented roles, whether as a team leader,
+              technical lead, or a supporting lead who bridges people and delivery.
+              I enjoy responsibility, coordination, and helping others perform at their best,
+              and this internship showed me that I am energised by roles that combine
+              technical thinking and leadership.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cover-letter">
+      <div class="container">
+        <div class="content">
+          <h2 class="section-title">Cover Letter</h2>
+          <p class="section-intro">
+            This version is structured around the professional capabilities and selection criteria in my current draft.
+          </p>
+
+          <div class="letter-block">
+            <p><strong>Dear Industrus Engineering Hiring Team,</strong></p>
+            <p>
+              I am writing to apply for the Graduate Engineer position offered through your graduate program.
+              I am currently completing my Bachelor of Engineering (Honours) in Mechatronics and am particularly
+              drawn to Industrus Engineering because of its multidisciplinary project work and its commitment
+              to creating meaningful and lasting impact in the community.
+            </p>
+            <p>
+              I am eager to begin my career in an environment where I can continue to learn and develop both
+              technically and professionally while contributing to practical engineering projects.
+            </p>
+          </div>
+
+          <div class="letter-block">
+            <h3>Ethical Conduct and Professional Accountability</h3>
+            <p>
+              During my internship, I served as team lead for a multidisciplinary engineering project.
+              As the project progressed, unforeseen issues affected our timeline and we had to delay delivery on several occasions.
+              In response, I maintained regular communication with the client, keeping them informed of setbacks,
+              providing progress updates, and being transparent about what could realistically be achieved within a tight timeframe.
+            </p>
+            <p>
+              Although the final delivery did not fully match the original scope, my team and I agreed that quality and usability
+              could not be compromised simply to meet the timeline. This reinforced for me that professional accountability
+              is shown through honesty, sound judgement, and maintaining client trust when circumstances do not go to plan.
+            </p>
+          </div>
+
+          <div class="letter-block">
+            <h3>Communication Across Disciplines</h3>
+            <p>
+              During my internship, I communicated regularly with clients to provide updates on progress,
+              discuss scope changes, explain project blockers, and clarify delivery expectations.
+              At the same time, I coordinated a team of eight engineers from different disciplinary backgrounds,
+              which required me to adapt my communication across different technical perspectives
+              and keep the team aligned on priorities.
+            </p>
+          </div>
+
+          <div class="letter-block">
+            <h3>Innovation, Initiative, and Proactivity</h3>
+            <p>
+              My internship involved technical issues that required us to move away from our original approach.
+              Rather than waiting for others to resolve them, I took initiative by identifying possible causes,
+              reviewing each possibility based on likelihood, and working through component datasheets
+              and technical documentation to investigate solutions.
+            </p>
+            <p>
+              I also helped create an environment within the team where problems were raised early
+              so that potential solutions could be explored immediately.
+            </p>
+          </div>
+
+          <div class="letter-block">
+            <h3>Managing Information and Performance</h3>
+            <p>
+              As team lead during my internship, I was responsible for managing changing project information,
+              including evolving client requirements, technical issues, progress tracking, and shifting priorities.
+              I also actively sought feedback from team members and supervisors to improve my own performance
+              in a professional environment.
+            </p>
+          </div>
+
+          <div class="letter-block">
+            <h3>Teamwork and Leadership</h3>
+            <p>
+              During my internship, I worked closely with a multidisciplinary team of eight engineers while serving as team lead.
+              When unforeseen issues and client changes affected our timeline, I stepped into a leadership role
+              by redistributing tasks, clarifying priorities, and helping the team maintain momentum.
+            </p>
+          </div>
+
+          <div class="letter-block">
+            <p>
+              I would welcome the opportunity to discuss my application further and can be contacted via email at
+              <a href="mailto:stephenchrissuiwi@gmail.com">stephenchrissuiwi@gmail.com</a>.
+              Please find my resume attached for your consideration.
+            </p>
+            <p><strong>Regards,</strong><br>Stephen Christian Suiwinata</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="content">
+          <h2 class="section-title">Contact</h2>
+          <p class="section-intro">
+            Professional contact details and links.
+          </p>
+
+          <div class="contact-grid">
+            <div class="contact-item">
+              <h3>Email</h3>
+              <p><a href="mailto:stephenchrissuiwi@gmail.com">stephenchrissuiwi@gmail.com</a></p>
+            </div>
+
+            <div class="contact-item">
+              <h3>LinkedIn</h3>
+              <p><a href="http://www.linkedin.com/in/stephen-suiwinata-652ab028a" target="_blank">View profile</a></p>
+            </div>
+
+            <div class="contact-item">
+              <h3>Career Focus</h3>
+              <p>Graduate roles in robotics, systems engineering, and collaborative technical teams.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Stephen Suiwinata — ePortfolio
+    </div>
+  </footer>
+</body>
+</html>
