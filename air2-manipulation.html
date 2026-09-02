@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIR2 Manipulation | Stephen Suiwinata</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #14181c;
+      --panel: #1c2126;
+      --ink: #e9ecea;
+      --muted: #9ba5aa;
+      --line: #2b3238;
+      --hazard: #f4b52c;
+      --telemetry: #4fd1c5;
+      --max: 1440px;
+      --rail: 232px;
+      --display: "Big Shoulders Display", Impact, sans-serif;
+      --sans: "IBM Plex Sans", Arial, Helvetica, sans-serif;
+      --mono: "IBM Plex Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 1.08rem;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    a { color: var(--telemetry); }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--telemetry); outline-offset: 3px; }
+
+    p { margin: 0 0 1em; max-width: 68ch; }
+    h1, h2, h3 { margin: 0; }
+
+    .layout {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 28px 32px 60px;
+      display: flex;
+      align-items: flex-start;
+      gap: 48px;
+    }
+
+    .sidenav {
+      position: sticky;
+      top: 28px;
+      width: var(--rail);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .sidenav .brand-block .brand {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 1.7rem;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .sidenav .brand-block a.back {
+      display: inline-block;
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .brand-block a.back:hover { color: var(--telemetry); }
+
+    .sidenav nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+    .sidenav nav a {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.94rem;
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 0 7px 14px;
+      border-left: 2px solid var(--line);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .sidenav nav a:hover { color: var(--ink); }
+    .sidenav nav a.active { color: var(--telemetry); border-left-color: var(--telemetry); }
+
+    .sidenav .rail-links { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .sidenav .rail-links a {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .rail-links a:hover { color: var(--telemetry); }
+
+    .content { flex: 1; min-width: 0; }
+
+    .section { padding: 56px 0; border-top: 1px solid var(--line); }
+    .section:first-of-type { border-top: none; padding-top: 0; }
+
+    h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      font-size: clamp(1.8rem, 2.9vw, 2.4rem);
+      margin-bottom: 22px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--telemetry);
+      background: rgba(79, 209, 197, 0.08);
+      border: 1px solid rgba(79, 209, 197, 0.28);
+      padding: 5px 12px;
+      border-radius: 3px;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+    .badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--telemetry);
+      box-shadow: 0 0 6px var(--telemetry);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .badge .dot { animation: pulse 2.4s ease-in-out infinite; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: clamp(3rem, 5.6vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 44px;
+      align-items: center;
+    }
+    .hero-text p { max-width: 46ch; color: var(--ink); font-size: 1.05rem; }
+
+    .video-block { margin: 18px 0; }
+    .video-frame { position: relative; }
+    .video-frame video, .video-frame img {
+      display: block;
+      width: 100%;
+      border-radius: 2px;
+      background: #000;
+    }
+    .corner {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--telemetry);
+    }
+    .corner.tl { top: -7px; left: -7px; border-right: none; border-bottom: none; }
+    .corner.tr { top: -7px; right: -7px; border-left: none; border-bottom: none; }
+    .corner.bl { bottom: -7px; left: -7px; border-right: none; border-top: none; }
+    .corner.br { bottom: -7px; right: -7px; border-left: none; border-top: none; }
+    .video-caption {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 10px;
+      max-width: none;
+    }
+
+    #capabilities p { max-width: none; }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 26px 0;
+    }
+    .chart-frame {
+      position: relative;
+      background: #fff;
+      border-radius: 2px;
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+    }
+    .chart-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .chart-caption {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 8px;
+      max-width: none;
+    }
+
+    .timeline-single {
+      max-width: 640px;
+      margin: 0 auto;
+      padding-left: 22px;
+      border-left: 1px solid var(--line);
+    }
+    .timeline-single li {
+      margin-bottom: 16px;
+      padding-left: 8px;
+      font-size: 1.02rem;
+      color: var(--muted);
+      max-width: 72ch;
+    }
+    .timeline-single li.milestone {
+      font-weight: 600;
+      color: var(--hazard);
+    }
+
+    .difficulties-log {
+      display: flex;
+      flex-direction: column;
+    }
+    .difficulties-log .phase {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 32px;
+      padding: 36px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .difficulties-log .phase:first-child { padding-top: 0; }
+    .difficulties-log .phase:last-child { border-bottom: none; padding-bottom: 0; }
+    .difficulties-log .phase-index {
+      font-family: var(--mono);
+      color: var(--hazard);
+    }
+    .difficulties-log .phase-index .num {
+      display: block;
+      font-size: 2.1rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .difficulties-log .phase-index .eyebrow {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .difficulties-log .phase h3 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 14px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .difficulties-log .phase p { color: var(--muted); max-width: 72ch; }
+    .difficulties-log .phase p:last-child { margin-bottom: 0; }
+    .difficulties-log .video-block { max-width: 72ch; }
+
+    .status-videos {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 28px;
+    }
+    .status-text p { max-width: none; }
+
+    .ack p { color: var(--muted); max-width: none; }
+    .ack p.tools { font-size: 1rem; }
+
+    footer {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 30px 32px 50px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-family: var(--mono);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .reveal.is-visible { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 960px) {
+      .layout, footer { margin-left: auto; }
+      .layout { flex-direction: column; padding: 20px 24px 48px; gap: 28px; }
+      .sidenav {
+        position: static;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .sidenav nav ul { flex-direction: row; flex-wrap: wrap; gap: 4px 16px; }
+      .sidenav nav a { border-left: none; border-bottom: 2px solid var(--line); padding: 4px 0; }
+      .sidenav nav a.active { border-left: none; border-bottom-color: var(--telemetry); }
+      .sidenav .rail-links { flex-direction: row; gap: 18px; border-top: none; padding-top: 0; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .difficulties-log .phase { grid-template-columns: 1fr; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidenav">
+      <div class="brand-block">
+        <div class="brand">AIR2 Manipulation</div>
+        <a class="back" href="index.html">&larr; Portfolio</a>
+      </div>
+      <nav aria-label="Section navigation">
+        <ul>
+          <li><a href="#hero" data-nav>Overview</a></li>
+          <li><a href="#timeline" data-nav>Timeline</a></li>
+          <li><a href="#difficulties" data-nav>Difficulties</a></li>
+          <li><a href="#status" data-nav>Status</a></li>
+          <li><a href="#acknowledgements" data-nav>Acknowledgements</a></li>
+        </ul>
+      </nav>
+      <div class="rail-links">
+        <a href="https://github.com/Kaung-dev/AI_Robot_Manipulation_UR3e" target="_blank" rel="noopener">GitHub &#8599;</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="section" id="hero">
+        <div class="hero-grid">
+          <div class="hero-text">
+            <div class="badge"><span class="dot"></span>AIR2 &middot; University Group Project &middot; Completed</div>
+            <h1>AIR2 Manipulation</h1>
+            <p>
+              This was a university group project to get a Franka arm finding and sorting
+              tools on a pegboard using AI end to end. A CNN figures out where each tool
+              actually is, and a trained policy per tool figures out how to grab it and
+              carry it to a basket. I trained the segmentation CNN, built and tuned the
+              policy training pipeline including the fix that let a policy learn approach
+              and carry as separate behaviors instead of blending both, and used Isaac
+              Lab's Mimic tool to turn a handful of human demos into the data those models
+              trained on, porting that whole pipeline from a teammate's Windows-only setup
+              to Linux along the way.
+            </p>
+          </div>
+          <div class="video-block">
+            <div class="video-frame">
+              <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+              <video controls autoplay muted loop playsinline preload="auto">
+                <source src="videos/air2-brush-multirun.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="video-caption">The brush policy reaching three different pegboard slots, evaluated back to back.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="capabilities">
+        <h2>What it does now</h2>
+        <p>
+          The finished system takes a camera image of a pegboard holding three small
+          tools, a paintbrush, pliers, and a screwdriver, and works out which
+          ones are there and where. A U-Net segmentation model finds each tool's pixels,
+          and depth plus camera intrinsics turn that into a 3D position for each one. A
+          small per-tool policy then drives the Franka arm through reach, grasp, and
+          carry, and an orchestrator runs through the detected tools closest to the
+          basket first.
+        </p>
+        <p>
+          I trained the segmentation model myself, reaching 0.919 mean IoU on the tool
+          classes with a U-Net backbone, after collecting and cleaning the training
+          frames and fixing a bug where the model's world-space position output was
+          always empty. On the reinforcement learning side I redesigned the reward
+          function the arm was trained against, adding penalties for dropping a grasped
+          tool or losing the grasp entirely, across nine reward terms in total.
+        </p>
+        <p>
+          The policies that actually run in the final demo came from Isaac Lab's Mimic
+          pipeline rather than reinforcement learning. You record a handful of human
+          demonstrations by teleoperating the arm, Mimic replays and randomizes them
+          into hundreds of synthetic trajectories, and a small MLP is trained on those
+          trajectories through behavior cloning. I ported this whole pipeline from a
+          teammate's Windows-only setup to Linux, fixing several Isaac Lab API
+          differences along the way, then found and fixed the reason the trained
+          policies could approach a tool but not carry it. I also fixed a separate
+          generalization problem where policies memorized the exact slot position they
+          were trained on instead of the underlying reach and grasp behavior. In the
+          final evaluation runs, the brush and pliers policies reached the basket in all
+          15 of 15 episodes each, and the screwdriver policy reached it in 11 of 15.
+        </p>
+
+        <div class="chart-row">
+          <div class="chart-block">
+            <div class="chart-frame">
+              <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+              <img src="air2-mimic-pipeline.png" alt="Mimic generation quality per tool: brush 97% clean, pliers 72% clean, screwdriver 95% clean, each generated from 80 human demos.">
+            </div>
+            <p class="chart-caption">Mimic-generated demo quality per tool, from the same handful of human demos each.</p>
+          </div>
+          <div class="chart-block">
+            <div class="chart-frame">
+              <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+              <img src="air2-eval-success-rate.png" alt="BC policy runs per slot, pass vs fail, across the R0/R1/R2 generalization checkpoints.">
+            </div>
+            <p class="chart-caption">Pass/fail counts per tool across the three generalization fix checkpoints (R0 to R2).</p>
+          </div>
+          <div class="chart-block">
+            <div class="chart-frame">
+              <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+              <img src="air2-eval-steps.png" alt="Mean steps to complete a successful episode, by tool, across R0/R1/R2.">
+            </div>
+            <p class="chart-caption">Mean steps per successful episode, same checkpoints.</p>
+          </div>
+        </div>
+
+        <p>
+          I also built a diffusion policy as a second imitation learning approach
+          alongside behavior cloning, an MLP noise predictor with FiLM conditioning
+          trained with a cosine DDPM schedule and sampled with DDIM, reusing the same
+          frozen visual encoder as the behavior cloning pipeline.
+        </p>
+      </section>
+
+      <section class="section reveal" id="timeline">
+        <h2>Timeline</h2>
+
+        <ol class="timeline-single">
+          <li>Franka pegboard tasks and hook randomization set up, with pick and place cameras.</li>
+          <li>Added VR hand tracking teleop for the Franka arm, plus a recording pipeline for demos.</li>
+          <li>Built per-object pick tasks for all three tools, each with its own 60 second episode.</li>
+          <li>Fixed camera and asset path portability issues so the project ran cleanly on a fresh machine.</li>
+          <li>Merged in a teammate's segmentation and goal-conditioned behavior cloning pipeline from a separate branch.</li>
+          <li>Repo cleanup and task rename, discovered the arm had been a Franka all along rather than a UR3e.</li>
+          <li>Trained the U-Net segmentation model to 0.919 tool mIoU, fixed the world position bug, and finished the nine-term reward redesign.</li>
+          <li>Diagnosed why a teammate's visual behavior cloning checkpoint never attempted a grasp, and fixed the eval script's basket-reached metric.</li>
+          <li>Built a diffusion policy as a second imitation learning approach.</li>
+          <li>Built the Mimic to behavior cloning pipeline, and ported it from Windows to Linux.</li>
+          <li>Set up PPO warm starting from a behavior cloning checkpoint, porting it for a newer RL library version.</li>
+          <li>Found and fixed the observation frame mismatch that was limiting the policy to a narrow set of starting poses.</li>
+          <li>Added phase conditioning so trained policies could carry a tool, not just approach it.</li>
+          <li>Fixed a generalization bug where policies memorized training slot positions instead of the underlying task.</li>
+          <li>Built the first version of the sequential multi-tool evaluation pipeline.</li>
+          <li class="milestone">Teammates extended that pipeline into the finished CNN driven three-tool pick and place demo.</li>
+        </ol>
+      </section>
+
+      <section class="section reveal" id="difficulties">
+        <h2>Difficulties</h2>
+
+        <div class="difficulties-log">
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">01</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>A borrowed policy that never touched a tool</h3>
+              <p>
+                A teammate handed off a trained visual behavior cloning checkpoint that
+                looked complete but never picked anything up in practice. Running it
+                showed the arm drove straight toward the basket every time and the
+                gripper never closed, as if it had memorized the destination and skipped
+                the middle of the task entirely. Digging into how it was trained turned
+                up two problems at once, it had been trained on camera footage from a
+                different camera position than the one actually running, and it had no
+                segmentation encoder feeding it useful visual features. Between the two,
+                the pick phase of the task had nothing meaningful to learn from, so it
+                never learned it.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">02</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Porting Mimic from Windows to Linux</h3>
+              <p>
+                A teammate had built the Mimic demo collection and generation pipeline
+                on Windows, and porting it to Linux surfaced a run of small but blocking
+                API mismatches, one after another. The environment's device had to be
+                read through an extra wrapper layer that only exists on Linux, the
+                teleop step that used to return separate pose and gripper values now
+                returned a single combined tensor, an export step had to run before an
+                episode could be added to the dataset, and the end effector frame itself
+                had a different name in the newer environment version. None of these had
+                an obvious single cause, each one only showed up once the previous one
+                was fixed, so it took working through the pipeline one error at a time
+                rather than assuming it was broken in one place.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">03</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Object position and target position in different frames</h3>
+              <p>
+                The trained behavior cloning policy worked when the arm started from
+                roughly the pose it was trained on and fell apart everywhere else.
+                Tracing it back, the policy's observations left out the end effector's
+                own position and rotation entirely, so the only way it could infer where
+                the gripper was in space was by reasoning backward from joint angles,
+                and on top of that, the object's position and the basket's position were
+                recorded in two different coordinate frames, one relative to the robot's
+                base and one in world space, so there was no consistent direction the
+                network could learn from one to the other. Fixed by adding the end
+                effector's position and rotation to the observations directly and
+                retraining.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">04</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>A policy that could approach but not carry</h3>
+              <p>
+                Training the gripper itself didn't work the way it should have first.
+                The demos label it as a plain plus one or minus one signal, but training
+                it with the same loss as the rest of the action space just taught the
+                policy to output near zero for it always, effectively always open, since
+                that's the value that minimizes error against a signal flipping between
+                two extremes. Switching that one output to a loss meant for binary
+                signals fixed the collapse, but its scale dominated everything else, that
+                loss sat around 0.7 while the arm's own loss sat around 0.001, so training
+                on both together just meant the model stopped learning the arm at all.
+                The workaround was to drop the trained gripper output entirely and
+                replace it at evaluation time with a simple rule instead, close the
+                gripper once the arm had held near the object for long enough.
+              </p>
+              <p>
+                That workaround created its own bug. Forcing the arm to freeze for a
+                fixed number of steps while the gripper closed put the policy into an
+                observation it had never seen in training, an arm sitting still with the
+                gripper already closed, so the moment carry phase started it had nothing
+                to go on and barely moved. The real fix was phase conditioned behavior
+                cloning, labeling every training step with which phase of the task it
+                belonged to, taken from the exact subtask boundary Mimic already records
+                when the grasp signal fires, and feeding that phase in as an extra input
+                so the policy learned separate approach and carry behavior instead of
+                guessing blind the moment the gripper closed. Even that only worked at
+                one slot position out of three at first, the other two didn't generalize.
+              </p>
+              <div class="video-block">
+                <div class="video-frame">
+                  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+                  <video controls muted loop playsinline preload="metadata">
+                    <source src="videos/air2-carry-failure.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <p class="video-caption">The pre-fix policy grasps the brush fine, then drops it beside the basket instead of releasing into it.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">05</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Getting one tool to actually generalize</h3>
+              <p>
+                Getting even one tool's policy to generalize across all of its reachable
+                slots took a chain of separate fixes stacked on top of each other, and
+                the first thing tried was rewriting the training loss. The theory was
+                that the training data was dominated by a handful of near zero dwell
+                steps at the very start of every demo, before the arm actually started
+                moving, and that was teaching the policy to output near zero whenever it
+                saw a fresh reset. Down weighting those steps in the loss, a fix credited
+                to both of us, had no measurable effect at all.
+              </p>
+              <p>
+                The actual problem was further upstream. The data generation step itself
+                had object randomization silently disabled, so every synthetic demo it
+                produced started from the same slot no matter how many were generated.
+                No amount of reweighting a training loss fixes a dataset that never had
+                the variation to learn from in the first place.
+              </p>
+              <p>
+                Once that was fixed and multi slot data was actually being generated, two
+                more bugs surfaced before it worked end to end. The observation the
+                policy used for where to carry the object was being fed a noisy resampled
+                command instead of the object's real position, a mismatch between what it
+                saw in training and what it saw at evaluation. And the release logic
+                itself was broken, the arm would carry the object above the basket rim
+                and then just never let go, since the release condition also checked a
+                height it never reached while holding something up that high. One slot
+                still overshot on approach after all of that, fixed by servoing the arm
+                directly onto the object's real position once it got close, instead of
+                trusting the policy's raw output that close in.
+              </p>
+              <div class="video-block">
+                <div class="video-frame">
+                  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+                  <video controls muted loop playsinline preload="metadata">
+                    <source src="videos/air2-brush-multirun.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <p class="video-caption">The brush policy after the fix, reaching three different pegboard slots across separate evaluation episodes.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="status">
+        <h2>Current status</h2>
+
+        <div class="status-grid">
+          <div class="status-text">
+            <p>
+              The project finished as a working three-tool demo. A Franka arm uses the
+              segmentation model to find whichever of the three tools are on the
+              pegboard, then runs a per-tool policy to pick up and carry the one closest
+              to the basket first, cycling through the rest. A fourth tool, scissors,
+              was scoped out along the way once it turned out to be too difficult to
+              reach reliably in the time available.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section ack reveal" id="acknowledgements">
+        <h2>Acknowledgements &amp; tools</h2>
+        <p>
+          Built on NVIDIA's Isaac Sim and Isaac Lab for simulation and the task
+          framework, and Isaac Lab's Mimic extension for turning a small number of
+          human demonstrations into hundreds of synthetic training trajectories.
+        </p>
+        <p class="tools">
+          Built with Isaac Sim and Isaac Lab, Isaac Lab Mimic, PyTorch for the
+          segmentation model, diffusion policy, and behavior cloning training, and
+          rsl_rl for PPO.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div><a href="index.html">&larr; Back to portfolio</a></div>
+  </footer>
+
+  <script>
+    (function () {
+      var links = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+      var sections = links.map(function (a) {
+        return document.getElementById(a.getAttribute('href').slice(1));
+      });
+
+      function onScroll() {
+        var pos = window.scrollY + 120;
+        var current = sections[0];
+        sections.forEach(function (sec) {
+          if (sec && sec.offsetTop <= pos) current = sec;
+        });
+        links.forEach(function (a) {
+          a.classList.toggle('active', current && a.getAttribute('href') === '#' + current.id);
+        });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      } else if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+      } else {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    })();
+  </script>
+
+</body>
+</html>

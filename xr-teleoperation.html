@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XR Teleoperation | Stephen Suiwinata</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /*
+      Reusable project-page design system (first built for neuroware.html).
+      Dark "sim viewport" theme + warehouse hazard-yellow / telemetry-cyan
+      two-accent system. Sidebar nav + wide content column instead of a
+      centered readme-style single column.
+
+      To reuse for a new project:
+        1. Copy this file to <project>.html next to index.html.
+        2. Fill in every [BRACKETED PLACEHOLDER].
+        3. Drop real clips in a ./videos/ folder next to the new page.
+        4. Add a nav link to it from index.html.
+    */
+    :root {
+      --bg: #14181c;
+      --panel: #1c2126;
+      --ink: #e9ecea;
+      --muted: #9ba5aa;
+      --line: #2b3238;
+      --hazard: #f4b52c;
+      --telemetry: #4fd1c5;
+      --max: 1440px;
+      --rail: 232px;
+      --display: "Big Shoulders Display", Impact, sans-serif;
+      --sans: "IBM Plex Sans", Arial, Helvetica, sans-serif;
+      --mono: "IBM Plex Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 1.08rem;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    a { color: var(--telemetry); }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--telemetry); outline-offset: 3px; }
+
+    p { margin: 0 0 1em; max-width: 68ch; }
+    h1, h2, h3 { margin: 0; }
+
+    /* ---- layout shell ---- */
+    .layout {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 28px 32px 60px;
+      display: flex;
+      align-items: flex-start;
+      gap: 48px;
+    }
+
+    .sidenav {
+      position: sticky;
+      top: 28px;
+      width: var(--rail);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .sidenav .brand-block .brand {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 1.7rem;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .sidenav .brand-block a.back {
+      display: inline-block;
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .brand-block a.back:hover { color: var(--telemetry); }
+
+    .sidenav nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+    .sidenav nav a {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.94rem;
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 0 7px 14px;
+      border-left: 2px solid var(--line);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .sidenav nav a:hover { color: var(--ink); }
+    .sidenav nav a.active { color: var(--telemetry); border-left-color: var(--telemetry); }
+
+    .sidenav .rail-links { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .sidenav .rail-links a {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .rail-links a:hover { color: var(--telemetry); }
+
+    .content { flex: 1; min-width: 0; }
+
+    .section { padding: 56px 0; border-top: 1px solid var(--line); }
+    .section:first-of-type { border-top: none; padding-top: 0; }
+
+    h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      font-size: clamp(1.8rem, 2.9vw, 2.4rem);
+      margin-bottom: 22px;
+    }
+
+    /* ---- hero ---- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--telemetry);
+      background: rgba(79, 209, 197, 0.08);
+      border: 1px solid rgba(79, 209, 197, 0.28);
+      padding: 5px 12px;
+      border-radius: 3px;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+    .badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--telemetry);
+      box-shadow: 0 0 6px var(--telemetry);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .badge .dot { animation: pulse 2.4s ease-in-out infinite; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: clamp(3rem, 5.6vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 44px;
+      align-items: center;
+    }
+    .hero-text p { max-width: 46ch; color: var(--ink); font-size: 1.05rem; }
+
+    /* ---- video viewport-frame signature ---- */
+    .video-block { margin: 18px 0; }
+    .video-frame { position: relative; }
+    .video-frame video, .video-frame img {
+      display: block;
+      width: 100%;
+      border-radius: 2px;
+      background: #000;
+    }
+    .corner {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--telemetry);
+    }
+    .corner.tl { top: -7px; left: -7px; border-right: none; border-bottom: none; }
+    .corner.tr { top: -7px; right: -7px; border-left: none; border-bottom: none; }
+    .corner.bl { bottom: -7px; left: -7px; border-right: none; border-top: none; }
+    .corner.br { bottom: -7px; right: -7px; border-left: none; border-top: none; }
+    .video-caption {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 10px;
+      max-width: none;
+    }
+
+    /* ---- timeline: multi-era grid ----
+       nth-child(N) columns can be uneven (e.g. 1fr 1fr 1.4fr) if one era's
+       list is much longer than the others -- see neuroware.html history. */
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-bottom: 32px;
+    }
+    .phase h3 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--ink);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--telemetry);
+    }
+    .timeline-grid .phase ol {
+      margin: 0;
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+      margin-left: 2px;
+    }
+    .timeline-grid .phase li {
+      margin-bottom: 12px;
+      padding-left: 6px;
+      font-size: 1.02rem;
+      color: var(--muted);
+    }
+    .timeline-grid .phase li.milestone {
+      font-weight: 600;
+      color: var(--hazard);
+    }
+    .timeline-note { max-width: none; color: var(--muted); margin-bottom: 32px; }
+
+    .timeline-single {
+      max-width: 640px;
+      margin: 0 auto;
+      padding-left: 22px;
+      border-left: 1px solid var(--line);
+    }
+    .timeline-single li {
+      margin-bottom: 16px;
+      padding-left: 8px;
+      font-size: 1.02rem;
+      color: var(--muted);
+      max-width: 72ch;
+    }
+    .timeline-single li.milestone {
+      font-weight: 600;
+      color: var(--hazard);
+    }
+    .timeline-single .video-block {
+      max-width: 320px;
+      margin: 10px auto 4px;
+    }
+    .timeline-single .video-caption { font-size: 0.78rem; }
+    #capabilities p { max-width: none; }
+
+    /* ---- difficulties: single-column log ----
+       Use this instead of a card grid -- items are rarely equal length,
+       and a symmetric grid just produces awkward empty space. */
+    .difficulties-log {
+      display: flex;
+      flex-direction: column;
+    }
+    .difficulties-log .phase {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 32px;
+      padding: 36px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .difficulties-log .phase:first-child { padding-top: 0; }
+    .difficulties-log .phase:last-child { border-bottom: none; padding-bottom: 0; }
+    .difficulties-log .phase-index {
+      font-family: var(--mono);
+      color: var(--hazard);
+    }
+    .difficulties-log .phase-index .num {
+      display: block;
+      font-size: 2.1rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .difficulties-log .phase-index .eyebrow {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .difficulties-log .phase h3 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 14px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .difficulties-log .phase p { color: var(--muted); max-width: 72ch; }
+    .difficulties-log .phase p:last-child { margin-bottom: 0; }
+    .difficulties-log .video-block { max-width: 72ch; }
+
+    /* ---- current status: prose, then full-width videos ---- */
+    .status-videos {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 28px;
+    }
+    .status-text p { max-width: none; }
+    .status-grid ul { padding-left: 20px; max-width: none; color: var(--muted); }
+    .status-grid li { margin-bottom: 8px; }
+    .status-grid strong {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--telemetry);
+      margin-bottom: 8px;
+    }
+
+    .ack p { color: var(--muted); max-width: none; }
+    .ack p.tools { font-size: 1rem; }
+
+    footer {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 30px 32px 50px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-family: var(--mono);
+    }
+
+    /* ---- reveal on scroll ---- */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .reveal.is-visible { opacity: 1; transform: none; }
+    }
+
+    /* ---- responsive ---- */
+    @media (max-width: 960px) {
+      .layout, footer { margin-left: auto; }
+      .layout { flex-direction: column; padding: 20px 24px 48px; gap: 28px; }
+      .sidenav {
+        position: static;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .sidenav nav ul { flex-direction: row; flex-wrap: wrap; gap: 4px 16px; }
+      .sidenav nav a { border-left: none; border-bottom: 2px solid var(--line); padding: 4px 0; }
+      .sidenav nav a.active { border-left: none; border-bottom-color: var(--telemetry); }
+      .sidenav .rail-links { flex-direction: row; gap: 18px; border-top: none; padding-top: 0; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .difficulties-log .phase { grid-template-columns: 1fr; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidenav">
+      <div class="brand-block">
+        <div class="brand">XR Teleoperation</div>
+        <a class="back" href="index.html">&larr; Portfolio</a>
+      </div>
+      <nav aria-label="Section navigation">
+        <ul>
+          <li><a href="#hero" data-nav>Overview</a></li>
+          <li><a href="#timeline" data-nav>Timeline</a></li>
+          <li><a href="#difficulties" data-nav>Difficulties</a></li>
+          <li><a href="#status" data-nav>Status</a></li>
+          <li><a href="#acknowledgements" data-nav>Acknowledgements</a></li>
+        </ul>
+      </nav>
+      <div class="rail-links">
+        <a href="https://github.com/StephenCSui/XR_Teleoperation" target="_blank" rel="noopener">GitHub (ROS) &#8599;</a>
+        <a href="https://github.com/StephenCSui/XR-Teleoperation-Unity" target="_blank" rel="noopener">GitHub (Unity) &#8599;</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="section" id="hero">
+        <div class="hero-grid">
+          <div class="hero-text">
+            <div class="badge"><span class="dot"></span>University group project &middot; Complete</div>
+            <h1>XR Teleoperation</h1>
+            <p>
+              This was a university group project to let a VR headset control a robot arm
+              that draws on a real canvas, translating what you draw in Unity into real
+              strokes from a physical UR3 arm. My part was the XR side. I got a Meta Quest 2
+              controller driving the arm, with full control over both the simulated and
+              physical hardware. I built the control pipeline end to end, using a custom
+              authority filter and MoveIt Servo.
+            </p>
+          </div>
+          <div class="video-block">
+            <div class="video-frame">
+              <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+              <video controls autoplay muted loop playsinline preload="auto">
+                <source src="videos/xr-drawing-demo.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="video-caption">VR teleop driving the real UR3 to draw on the canvas, live at a lab demo.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="capabilities">
+        <h2>What it does now</h2>
+        <p>
+          Hand pose from a Quest 2 controller in Unity drives a real UR3 arm through MoveIt
+          Servo, via an authority filter handling anchor-based delta control, workspace
+          clamping, and mode switching. NORMAL mode gives full-range teleop. PRECISION mode
+          tightens the gains for close-up work, with a detach-and-nudge mode for fine
+          discrete positioning. Orientation snap aligns the controller and end-effector
+          frames on startup so the mapping feels natural in VR. On the Unity side, a virtual
+          canvas mirrors each stroke as you draw, and a precision bounding box you can resize
+          sets how fine that close-up control gets.
+        </p>
+        <div class="video-block">
+          <div class="video-frame">
+            <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+            <video controls muted loop playsinline preload="metadata">
+              <source src="videos/xr-showcase-final.mp4" type="video/mp4">
+            </video>
+          </div>
+          <p class="video-caption">Close-up PRECISION-mode control on the real arm, the last clip recorded for this project.</p>
+        </div>
+      </section>
+
+      <section class="section reveal" id="timeline">
+        <h2>Timeline</h2>
+
+        <ol class="timeline-single">
+          <li>ROS-TCP-Connector set up in Unity; hand pose publisher and keyboard toggle built.</li>
+          <li>High latency from the MoveIt planning cycle, and goal rejection when the hand moved too fast, not suitable for real-time teleop. Planning was dropped in favor of direct servo control.</li>
+          <li>Replaced planning with MoveIt Servo; built a P-controller and a C++ authority filter for safety gating, workspace limits, and deadbands.</li>
+          <li>Default arm pose hit singularities immediately on any movement. YAML tuning didn't help, fixed by changing the starting joint configuration instead.</li>
+          <li><code>forward_velocity_controller</code> kept defaulting inactive on startup. Set it as the default active controller in the launch arguments as a first fix.</li>
+          <li>That wasn't enough on its own, since MoveIt Servo also needed a reset/start/unpause sequence on every connection to the robot. Wrote <code>servo_auto_start</code>, a one-shot bootstrap node that does the whole sequence automatically at launch, gated on the robot's own "program running" signal.</li>
+          <li>First confirmed keyboard-driven control in simulation via servo.</li>
+          <li>Validated the full pipeline in URSim (Docker) before moving to physical hardware.</li>
+          <li>Wrong launch order left the velocity controller inactive. <code>servo_auto_start</code> was using a normal subscription and missed the robot's startup signal if it had already fired before the node subscribed. Fixed with a transient-local subscription so it always catches the robot's current state regardless of order.</li>
+          <li>Gains were too aggressive for real hardware, causing oscillation and overshoot. Retuned down significantly.</li>
+          <li>Missing settle delay meant the hand anchor latched before Unity finished its position snap, teleporting the arm on teleop enable. Fixed with a short delay.</li>
+          <li>
+            First confirmed control on physical UR3 hardware.
+            <div class="video-block">
+              <div class="video-frame">
+                <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+                <video controls muted loop playsinline preload="metadata">
+                  <source src="videos/xr-proper-vr-control.mp4" type="video/mp4">
+                </video>
+              </div>
+              <p class="video-caption">The pipeline working end to end, demoed in front of the rest of the lab.</p>
+            </div>
+          </li>
+          <li>Added PRECISION mode: position sensitivity scaled down significantly compared to NORMAL, with its own tuned deadband and step limits for close-up work.</li>
+          <li>Precision bounding box drawn in Unity drives position scale. Smaller box, finer control.</li>
+          <li>Detachment + nudge mode: suspends hand tracking, discrete button presses nudge position/orientation instead.</li>
+          <li>Position snap to the controller worked, but orientation snap was missing. Controls felt sideways depending on starting angle.</li>
+          <li>Implemented orientation snap on startup so the tracking origin faces a fixed known direction toward the robot.</li>
+          <li>Adjusted the wrist joint for a natural end-effector orientation matching VR controller ergonomics.</li>
+          <li class="milestone">APK built for Quest 2. End-to-end servo pipeline confirmed working in VR.</li>
+          <li>PRECISION entry gate widened, was too tight to enter reliably near the canvas.</li>
+          <li>PRECISION mode toggle made global, no longer gated on being near a specific position.</li>
+        </ol>
+      </section>
+
+      <section class="section reveal" id="difficulties">
+        <h2>Difficulties</h2>
+
+        <div class="difficulties-log">
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">01</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>The default pose was already broken</h3>
+              <p>
+                The arm started every session in its default pose, straight
+                down. The moment servo control tried to move it from there, it hit a
+                singularity and refused to respond. Tuning the servo YAML's singularity
+                thresholds and condition number limits did nothing. The real fix was
+                starting the arm from a different joint configuration that wasn't singular
+                in the first place, and that choice of starting pose stuck around as a hard
+                constraint for every later fix that touched the robot's starting angles.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">02</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>A controller that wouldn't stay active</h3>
+              <p>
+                MoveIt Servo would report itself as active right after launch, but that
+                status was misleading, trying to actually drive the arm through it did
+                nothing, since it hadn't really been started. Getting it truly running
+                meant explicitly resetting, starting, and unpausing servo through its own
+                services, not just trusting what it reported. <code>forward_velocity_controller</code>
+                needed to be switched active too, and none of this happened automatically,
+                so a bootstrap script, <code>servo_auto_start</code>, was built to do all
+                of it in one shot at launch, gated on the robot's own "program running"
+                signal.
+                That gate was initially unreliable, it used a normal subscription, so if the
+                robot had already started before the node subscribed, it missed that
+                already-published signal and just timed out, leaving the controller
+                inactive. Fixed by subscribing with a transient-local QoS profile, so it
+                always catches the robot's current state regardless of which started first.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">03</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Tuning for a real arm, not a simulated one</h3>
+              <p>
+                Gains that worked fine in simulation caused visible
+                oscillation and overshoot the moment the pipeline ran against the physical
+                UR3. URSim's simulated arm just followed commands instantly; the real one
+                had actual actuator latency, so the same gain that looked stable in
+                simulation overshot and corrected on real hardware instead of settling.
+                Fixed by reducing the linear gain and the arm's max speed substantially,
+                rather than assuming sim-tuned values would carry over.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">04</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>A teleport on every teleop enable</h3>
+              <p>
+                Enabling teleop made the arm jump instantly instead of smoothly picking up
+                from where the hand was, the same symptom as half the other bugs on this
+                list, so it wasn't obviously a timing issue at first. It turned out the
+                filter was latching its anchor the moment teleop was enabled, before Unity
+                had finished snapping the hand into position, so the anchor was captured
+                from a stale pose. Fixed with a short settle delay before the anchor is
+                latched.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">05</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Controls felt sideways in VR</h3>
+              <p>
+                Position tracking worked, but the controller's forward direction didn't
+                reliably map to the arm's forward direction, depending on which way the
+                headset was facing at startup, forward and sideways could get swapped.
+                Position snap alone wasn't enough; the fix was adding an orientation snap on
+                startup that turns the tracking origin to face a fixed known direction
+                toward the robot, so the mapping stays consistent no matter which way the
+                player is facing when they start.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">06</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Getting the canvas plane and start pose to agree</h3>
+              <p>
+                Moving the canvas stop/touch planes closer to the robot
+                without checking anything else would have made the arm jerk backward the
+                instant teleop was enabled, since its own starting position was already
+                past the new stop plane. Fixed by recalculating the starting joint angles
+                so the end-effector's starting position stayed safely behind the plane, and
+                writing that down as a standing rule to check any time either value
+                changes again.
+              </p>
+              <p>
+                A related bug meant PRECISION mode's simulated pen-down motion moved the
+                wrong way entirely, a sign error sent the virtual hand target away from
+                the canvas instead of toward it, so the arm barely moved on pen-down at
+                all. Fixed by correcting the sign and increasing the push distance so it
+                reliably overshoots into the plane clamp instead of falling short.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">07</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Getting the canvas to actually draw</h3>
+              <p>
+                Getting virtual drawing working on the canvas meant clearing a handful of
+                separate issues. The raycast used to represent the pen tip needed real
+                tuning to land on the canvas consistently instead of passing straight past
+                it. PRECISION mode had a control axis inverted at one point. Painting still
+                looked wrong even once the ray was landing, since the canvas's collider type
+                doesn't return valid UV data through Unity's raycast hit info, fixed by
+                rebuilding the UV mapping from the raycast hit's position directly.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">08</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>A raycast that skipped its own target</h3>
+              <p>
+                After rescaling the canvas-drawing collider down, drawing stopped
+                registering. The raycast used for painting was being cast from a point that
+                used to sit inside the collider, and a raycast never registers a hit against
+                the collider it starts inside of. Shrinking the collider moved the ray's
+                starting point outside it, so the ray now hit a different collider first
+                instead. Fixed by testing the canvas collider directly instead of relying on
+                a general-purpose raycast.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">09</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>A robot that was rotated 180&deg; from the math</h3>
+              <p>
+                The physical UR3 was mounted rotated 180&deg; around its base from what the
+                original software assumed. That rotation got propagated into the ROS launch
+                config, workspace bounds, canvas plane values, but not into the actual
+                Unity-to-ROS coordinate conversion formulas. So the position and rotation
+                math in the C++ authority filter, and in three separate Unity scripts, was
+                all using the wrong sign conventions at once. Re-derived the conversion
+                formulas for the rotated frame from scratch and updated all of them
+                together, since fixing only one would have just moved the mismatch
+                somewhere else.
+              </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">10</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>Silent failures from lost Unity wiring</h3>
+              <p>
+                Merging my Unity project with a teammate's surfaced a batch of script
+                references that had gone null, editor field assignments neither of us
+                could have caught while working in isolation. None of it threw an
+                error, the affected code just silently did nothing. The XR snap never fired
+                because its target reference was null. Two of the visualization boxes sat
+                frozen at the world origin regardless of what the real robot was doing,
+                because their reference fields were null too. On top of that, a flag
+                controlling when the control filter was allowed to lock onto its target had
+                been left in the wrong state, so it was locking on before the XR snap even
+                happened, chasing a target over a meter away from the real robot the entire
+                time. Fixed by re-wiring every null reference and restoring that flag.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="status">
+        <h2>Current status</h2>
+
+        <div class="status-grid">
+          <div class="status-text">
+            <p>
+              End to end, the system works on real hardware, a Quest 2
+              controller drives a physical UR3 arm through MoveIt Servo, with NORMAL and
+              PRECISION modes plus a detach-and-nudge mode for fine positioning. Canvas
+              plane calibration and the PRECISION pen-down behaviour are tuned and working
+              for the current physical setup.
+            </p>
+            <p>
+              What's unfinished is integration, not the control pipeline itself. I spent
+              most of my time getting my own subsystem solid and assumed combining it with
+              the rest of the team's work would be straightforward, since the interfaces
+              between them were well defined on paper. That assumption was wrong. Merging
+              the Unity projects surfaced missing scene references neither of us could have
+              caught in isolation, and some hardware quirks only showed up on certain
+              machines. I should have been integrating in parallel with my own work the
+              whole time, instead of treating it as a separate phase to handle once
+              everything else was done.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section ack reveal" id="acknowledgements">
+        <h2>Acknowledgements &amp; tools</h2>
+        <p>
+          This was a 3-person university group project. My part was the XR
+          and control side described on this page, the ROS2 authority filter, servo
+          control, precision/detachment modes, and the Unity-side scripts driving them. A
+          teammate built the camera-based canvas pose detection system; another built the
+          Unity environment. Neither is described here since it isn't my work.
+        </p>
+        <p class="tools">
+          Built with ROS2 and MoveIt Servo (real-time arm control), Unity and the
+          ROS-TCP-Connector (XR operator interface and the bridge to ROS), a UR3 robot arm
+          with URSim and Docker (hardware and simulation), and a Meta Quest 2 headset via
+          OpenXR (VR runtime).
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div><a href="index.html">&larr; Back to portfolio</a></div>
+  </footer>
+
+  <script>
+    (function () {
+      var links = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+      var sections = links.map(function (a) {
+        return document.getElementById(a.getAttribute('href').slice(1));
+      });
+
+      function onScroll() {
+        var pos = window.scrollY + 120;
+        var current = sections[0];
+        sections.forEach(function (sec) {
+          if (sec && sec.offsetTop <= pos) current = sec;
+        });
+        links.forEach(function (a) {
+          a.classList.toggle('active', current && a.getAttribute('href') === '#' + current.id);
+        });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      } else if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+      } else {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    })();
+  </script>
+
+</body>
+</html>

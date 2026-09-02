@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroWare | Stephen Suiwinata</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1d1f;
+      --bg-deep: #101214;
+      --panel: #232629;
+      --ink: #e8eaea;
+      --muted: #8b9296;
+      --line: #34383b;
+      --hazard: #f4b52c;
+      --telemetry: #b4e33d;
+      --max: 1440px;
+      --rail: 232px;
+      --display: "Space Grotesk", Arial, sans-serif;
+      --sans: "IBM Plex Sans", Arial, Helvetica, sans-serif;
+      --mono: "JetBrains Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 1.08rem;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    a { color: var(--telemetry); }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--telemetry); outline-offset: 3px; }
+
+    p { margin: 0 0 1em; max-width: 68ch; }
+    h1, h2, h3 { margin: 0; }
+
+    /* ---- layout shell ---- */
+    .layout {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 28px 32px 60px;
+      display: flex;
+      align-items: flex-start;
+      gap: 48px;
+    }
+
+    .sidenav {
+      position: sticky;
+      top: 28px;
+      width: var(--rail);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .sidenav .brand-block .brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+    }
+    .sidenav .brand-block .brand .caret { color: var(--telemetry); font-size: 0.75em; }
+    .sidenav .brand-block .prim-path {
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 5px;
+      padding-left: 19px;
+    }
+    .sidenav .brand-block a.back {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .brand-block a.back:hover { color: var(--telemetry); }
+
+    .sidenav nav ul { list-style: none; margin: 0; padding: 0 0 0 3px; display: flex; flex-direction: column; gap: 2px; border-left: 1px solid var(--line); }
+    .sidenav nav a {
+      display: flex;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      text-decoration: none;
+      color: var(--muted);
+      padding: 6px 0 6px 14px;
+      transition: color 0.15s;
+    }
+    .sidenav nav a .tree-glyph { color: var(--line); margin-right: 8px; font-size: 0.85em; transition: color 0.15s; }
+    .sidenav nav a:hover { color: var(--ink); }
+    .sidenav nav a.active { color: var(--telemetry); }
+    .sidenav nav a.active .tree-glyph { color: var(--telemetry); }
+
+    .sidenav .rail-links { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .sidenav .rail-links a {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .rail-links a:hover { color: var(--telemetry); }
+
+    .content { flex: 1; min-width: 0; }
+
+    .section { padding: 56px 0; border-top: 1px solid var(--line); }
+    .section:first-of-type { border-top: none; padding-top: 0; }
+
+    h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      font-size: clamp(1.8rem, 2.9vw, 2.4rem);
+      margin-bottom: 22px;
+    }
+
+    /* ---- hero ---- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--telemetry);
+      background: rgba(180, 227, 61, 0.08);
+      border: 1px solid rgba(180, 227, 61, 0.28);
+      padding: 5px 12px;
+      border-radius: 3px;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+    .badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--telemetry);
+      box-shadow: 0 0 6px var(--telemetry);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .badge .dot { animation: pulse 2.4s ease-in-out infinite; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: clamp(3rem, 5.6vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+
+    #hero {
+      position: relative;
+      overflow: hidden;
+      padding-bottom: 44px;
+    }
+    #hero::before {
+      content: "";
+      position: absolute;
+      left: -15%;
+      right: -15%;
+      bottom: -6%;
+      height: 72%;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 42px 42px;
+      opacity: 0.6;
+      transform: perspective(600px) rotateX(60deg);
+      transform-origin: center bottom;
+      -webkit-mask-image: linear-gradient(to top, black 0%, transparent 78%);
+      mask-image: linear-gradient(to top, black 0%, transparent 78%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 44px;
+      align-items: center;
+    }
+    .hero-text p { max-width: 46ch; color: var(--ink); font-size: 1.05rem; }
+
+    /* ---- video viewport-frame signature ---- */
+    .video-block { margin: 18px 0; }
+
+    #hero .video-block {
+      position: relative;
+      padding: 14px;
+      background: var(--bg-deep);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .video-frame { position: relative; }
+    .video-frame video {
+      display: block;
+      width: 100%;
+      border-radius: 3px;
+      background: #000;
+      border: 1px solid var(--line);
+    }
+    .viewport-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--telemetry);
+      background: rgba(16, 18, 20, 0.75);
+      border: 1px solid var(--line);
+      padding: 3px 8px;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+    .video-caption {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 10px;
+      max-width: none;
+    }
+
+    /* ---- timeline: 3-era grid ---- */
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-bottom: 32px;
+    }
+    .phase h3 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--ink);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--telemetry);
+    }
+    .timeline-grid .phase ol {
+      margin: 0;
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+      margin-left: 2px;
+    }
+    .timeline-grid .phase li {
+      margin-bottom: 12px;
+      padding-left: 6px;
+      font-size: 1.02rem;
+      color: var(--muted);
+    }
+    .timeline-grid .phase li.milestone {
+      font-weight: 600;
+      color: var(--hazard);
+    }
+    .timeline-note { max-width: none; color: var(--muted); margin-bottom: 32px; }
+    #capabilities p { max-width: none; }
+
+    /* ---- difficulties: single-column log ---- */
+    .difficulties-log {
+      display: flex;
+      flex-direction: column;
+    }
+    .difficulties-log .phase {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 32px;
+      padding: 36px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .difficulties-log .phase:first-child { padding-top: 0; }
+    .difficulties-log .phase:last-child { border-bottom: none; padding-bottom: 0; }
+    .difficulties-log .phase-index {
+      font-family: var(--mono);
+      color: var(--hazard);
+    }
+    .difficulties-log .phase-index .num {
+      display: block;
+      font-size: 2.1rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .difficulties-log .phase-index .eyebrow {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .difficulties-log .phase h3 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 14px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .difficulties-log .phase p { color: var(--muted); max-width: 72ch; }
+    .difficulties-log .phase p:last-child { margin-bottom: 0; }
+    .difficulties-log .video-block { max-width: 72ch; }
+
+    /* ---- current status: prose, then full-width videos ---- */
+    .status-videos {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 28px;
+    }
+    .status-text p { max-width: none; }
+    .status-grid ul { padding-left: 20px; max-width: none; color: var(--muted); }
+    .status-grid li { margin-bottom: 8px; }
+    .status-grid strong {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--telemetry);
+      margin-bottom: 8px;
+    }
+
+    .ack p { color: var(--muted); max-width: none; }
+    .ack p.tools { font-size: 1rem; }
+
+    footer {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 30px 32px 50px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-family: var(--mono);
+    }
+
+    /* ---- reveal on scroll ---- */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .reveal.is-visible { opacity: 1; transform: none; }
+    }
+
+    /* ---- responsive ---- */
+    @media (max-width: 960px) {
+      .layout, footer { margin-left: auto; }
+      .layout { flex-direction: column; padding: 20px 24px 48px; gap: 28px; }
+      .sidenav {
+        position: static;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .sidenav nav ul { flex-direction: row; flex-wrap: wrap; gap: 4px 16px; border-left: none; padding-left: 0; }
+      .sidenav nav a { border-bottom: 2px solid var(--line); padding: 4px 0; }
+      .sidenav nav a .tree-glyph { display: none; }
+      .sidenav nav a.active { border-bottom-color: var(--telemetry); }
+      .sidenav .brand-block .prim-path { padding-left: 0; }
+      .sidenav .rail-links { flex-direction: row; gap: 18px; border-top: none; padding-top: 0; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .timeline-grid { grid-template-columns: 1fr; }
+      .difficulties-log .phase { grid-template-columns: 1fr; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidenav">
+      <div class="brand-block">
+        <div class="brand"><span class="caret">&#9662;</span>NeuroWare.usd</div>
+        <div class="prim-path">/World/NeuroWare</div>
+        <a class="back" href="index.html">&larr; Portfolio</a>
+      </div>
+      <nav aria-label="Section navigation">
+        <ul>
+          <li><a href="#hero" data-nav><span class="tree-glyph">&#9500;&#9472;</span>Overview</a></li>
+          <li><a href="#timeline" data-nav><span class="tree-glyph">&#9500;&#9472;</span>Timeline</a></li>
+          <li><a href="#difficulties" data-nav><span class="tree-glyph">&#9500;&#9472;</span>Difficulties</a></li>
+          <li><a href="#status" data-nav><span class="tree-glyph">&#9500;&#9472;</span>Status</a></li>
+          <li><a href="#acknowledgements" data-nav><span class="tree-glyph">&#9492;&#9472;</span>Acknowledgements</a></li>
+        </ul>
+      </nav>
+      <div class="rail-links">
+        <a href="https://github.com/StephenCSui/NeuroWare" target="_blank" rel="noopener">GitHub &#8599;</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="section" id="hero">
+        <div class="hero-grid">
+          <div class="hero-text">
+            <div class="badge"><span class="dot"></span>Milestone 1 &middot; 2026-08-18 &middot; Confirmed</div>
+            <h1>NeuroWare</h1>
+            <p>
+              This is a personal project built around Isaac Sim, using Nav2 as its primary
+              navigation library. Isaac Sim stood out for its AI capabilities, which tools like
+              Gazebo don't offer to the same extent. Designing and training my own AI is something
+              I want to look into later on. I'd used Isaac Sim briefly on a university project
+              before and wanted to go further with it on something of my own.
+            </p>
+          </div>
+          <div class="video-block">
+            <div class="video-frame">
+              <span class="viewport-tag">Perspective</span>
+              <video controls autoplay muted loop playsinline preload="auto">
+                <source src="videos/milestone1-fullrun.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="video-caption">Milestone 1: full pickup-to-drop-off run, sped up 4x.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="capabilities">
+        <h2>What it does now</h2>
+        <p>
+          The current version is capable of moving a sequence of three objects, one at a time,
+          between shelves. What it's carrying changes how it acts during navigation, with
+          different shapes and weights calling for different behaviour around obstacles. The
+          hope is to have robot-to-robot cooperation working in a future implementation, for
+          objects too heavy or complex for a single robot to handle alone.
+        </p>
+      </section>
+
+      <section class="section reveal" id="timeline">
+        <h2>Timeline</h2>
+
+        <p class="timeline-note">
+          This project changed direction twice before settling on its current form. It started
+          as a swarm of robots pushing items across a warehouse floor, then pivoted to a
+          farming swarm, since farming seemed like a wider, more broadly useful application.
+          Over time it became clear that swarms, in their current form, aren't that effective,
+          largely because of hardware: swarm units tend to be heavier and more expensive than
+          expected, and most of what a swarm is supposed to offer can generally be matched more
+          cheaply with fixed infrastructure instead, like signal poles. Running real AI on a
+          swarm is difficult too, since you want a large number of units, but each one still
+          needs to be powerful enough to actually run it. I wanted to focus on learning what
+          already works and actually understanding it.
+        </p>
+
+        <div class="timeline-grid">
+          <div class="phase">
+            <h3>Push-model warehouse sim (abandoned)</h3>
+            <ol>
+              <li>Scoped the project, reviewed the reference paper and an existing robot model &mdash; no code yet.</li>
+              <li>Designed the agent/captain communication roles and message layers.</li>
+              <li>Built a gossip system for agents to share tasks directly &mdash; broke item delivery.</li>
+              <li>Fixed delivery, added 2-agent heavy-item carrying, fixed a captain-messaging crash.</li>
+              <li>Redesigned the whole simulation mid-project &mdash; from carrying items to physically pushing them, rewriting most of the codebase and chasing a new wave of physics bugs.</li>
+            </ol>
+          </div>
+
+          <div class="phase">
+            <h3>Farm-swarm (abandoned)</h3>
+            <ol>
+              <li>Pivoted to a farming swarm &mdash; agents growing and harvesting crops instead &mdash; built the lifecycle, scoring, and a first trained AI policy.</li>
+              <li>Fixed a deadlock where two agents could block each other forever &mdash; then discovered that bug had been silently corrupting every AI test result up to that point.</li>
+              <li>Tuned the AI's rewards &mdash; an attempt to punish crop deaths backfired and made it worse; fixed with a gradual penalty instead.</li>
+            </ol>
+          </div>
+
+          <div class="phase">
+            <h3>Cooperative transport &rarr; Isaac Sim (current line)</h3>
+            <ol>
+              <li>Pivoted again, to robots physically cooperating to carry heavy objects &mdash; built a 2D prototype to test the idea first.</li>
+              <li>Got Isaac Sim running on this machine around a graphics-memory limit; built a first minimal scene.</li>
+              <li>Brought the real robot model in and got its wheels driving under real physics for the first time.</li>
+              <li>Finished keyboard control, fixed commands going to the wrong joint, built a shelf.</li>
+              <li>Added a payload object with real physics; combined everything into one working scene.</li>
+              <li>Made the lift mechanism actually hold weight under load (found the real force needed by testing, not calculation); built the first autonomous pickup.</li>
+              <li>Got two robots cooperating to lift and carry an object too heavy for one alone.</li>
+              <li>Added obstacle-sensing cameras and a basic dodge-and-retry behavior &mdash; found it didn't reliably work.</li>
+              <li>Replaced the dodge behavior with real path planning; traced a stuck robot to a wheel scraping a shelf leg the camera couldn't see.</li>
+              <li>Root-caused two separate reasons the robot randomly refused to turn.</li>
+              <li>Switched the whole navigation system to ROS2's Nav2 after a hard software crash with the first approach.</li>
+              <li>Nav2's default driving curved instead of going straight &mdash; built a custom controller that only turns or drives, never both.</li>
+              <li>Built the first full pickup-carry-drop task; fixed a chain of bugs, including one where a correction command was silently overwritten every tick.</li>
+              <li>Chased an obstacle-reading bug into a real disagreement with the user &mdash; flagged as unresolved, to be re-checked from scratch.</li>
+              <li>Re-verified everything from real sensor data; found a genuine missing-collision bug an earlier session had wrongly ruled out.</li>
+              <li>Fixed that bug, then hit a runaway replanning loop (3,000+ cycles) &mdash; traced to two safety settings disagreeing with each other.</li>
+              <li class="milestone">Milestone 1 &mdash; fixed the replanning conflict, redesigned the platform's self-correction, and got the full pickup-to-drop-off sequence working live for the first time.</li>
+            </ol>
+
+            <ol start="18">
+              <li>Cleanup session, then found the depth cameras themselves were unreliable &mdash; replaced them with a more accurate sensing method after real investigation.</li>
+              <li>Extended pickup/carry to different-shaped objects; investigated (didn't fully solve) reacting to obstacles that appear mid-route; partly fixed objects slipping off during fast turns.</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="difficulties">
+        <h2>Difficulties</h2>
+
+        <div class="difficulties-log">
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">01</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+            <h3>A constant hardware constraint</h3>
+            <p>
+              GPU memory on this hardware is an ongoing constraint. Using default settings
+              outright isn't possible, and since the whole point of this project is getting
+              familiar with Isaac Sim, that's something that needs to be worked around
+              constantly rather than solved once. In practice that means constantly finding
+              lower-memory ways to do the same thing, cutting anything that isn't strictly
+              necessary, and swapping components for cheaper alternatives when one turns out
+              too expensive.
+            </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">02</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+            <h3>A reflex that couldn't tell it had failed</h3>
+            <p>
+              The first version of obstacle handling was reactive, and would only turn and
+              move at fixed distances once it detected something in its path. The real
+              problem wasn't the reflex itself, it's that it had no way of telling it had
+              failed. In one such case it turned straight into a shelf leg and got stuck. It
+              was unable to recognize it was stuck or attempt a different approach. As this
+              was early development, the system was eventually replaced with an
+              occupancy-grid + A* planner, giving the robot actual decision making instead of
+              a fixed reaction.
+            </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">03</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+            <h3>Migrating to Nav2</h3>
+            <p>
+              The planner built to fix the reactive-dodge problem had a bug of its own. It
+              kept a live map of what was around the robot, but when it spotted something
+              close and stopped, that sighting never got written into the map. So the next
+              time it planned a route, it didn't know that spot was blocked, and picked the
+              same route into the same obstacle again.
+            </p>
+            <p>
+              Even after that bug got fixed, the planner had failed live enough times that
+              continuing to patch it stopped making sense. The navigation system was migrated
+              to Nav2 instead, ROS2's own navigation stack.
+            </p>
+            <p>
+              The migration wasn't simple either. The first attempt tried running ROS2
+              directly inside Isaac Sim's own Python process, and it crashed immediately. The
+              cause was a mismatch between Python versions: Isaac Sim's Python and the ROS2
+              library it needed to talk to were each built for a different one, and that
+              broke the moment a real ROS2 message got created. It wasn't fixable by changing
+              a setting, it needed a different approach entirely.
+            </p>
+            <p>
+              The fix was switching to Isaac Sim's own built-in bridge instead, which talks
+              to ROS2 without going through that broken path. Once that was working, a
+              separate bug turned up in how goal positions were calculated: an offset wasn't
+              accounting for the robot's own starting rotation, which put a goal marker
+              almost 4 meters from where it should have been.
+            </p>
+            <p>
+              The Nav2 implementation allowed the robot to complete a full transport run
+              while avoiding an obstacle placed in front of its optimal path.
+            </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">04</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+            <h3>A fight between two motors</h3>
+            <p>
+              The robot is based on a modified version of a robot in a published paper.
+              During turns, the plate's own motor which actively counter-rotates it to keep
+              whatever it's carrying facing the same direction, was found to be interfering
+              with the wheels' own speed control. This was confirmed by testing the robot
+              completely empty, no cargo, no obstacles, and finding the same instability
+              still happened. The first fix tried was lowering that motor's strength, tested
+              at several levels all the way down to zero, but none of them helped, which
+              showed the problem wasn't the strength, it was that the motor was actively
+              driven at all. Fixed by disabling the plate's joint outright during a turn,
+              letting it hold still under its own weight, then re-enabling it once the turn
+              finished.
+            </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">05</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+            <h3>A safety margin off by 1.3cm</h3>
+            <p>
+              During a carry route, the robot got stuck detecting the same obstacle in a
+              loop. Once it stopped, it would replan a route, and immediately detect the same
+              obstacle again. The stop distance had been calculated from the robot and
+              object's size, and it landed just 1.3cm past a reading the sensor gave off on
+              its own, so the robot always read that as too close.
+            </p>
+            <p>
+              The first fix set the stop distance to exactly match the planner's own safety
+              margin. That stopped the loop, but broke planning instead. The robot now stood
+              right on the planner's boundary, which looked like a collision to it, so it
+              refused to plan any route at all.
+            </p>
+            <p>
+              The real fix was to set the stop distance from what the camera actually
+              reported near the boundary, instead of calculating it from geometry, and leave
+              enough gap between that and the safety margin for the planner to work with.
+            </p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">06</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+            <h3>Getting reliable ranging, ending in PhysX</h3>
+            <p>
+              The first attempt at obstacle ranging used a single camera. A real lidar sensor
+              was considered next for full coverage, but was rejected since it cost too much
+              memory compared to a camera. The setup was changed to 4 cameras, one on each
+              corner, acting like a lidar around the whole robot. This worked well enough to
+              get through Milestone 1. Later, an attempt was made to calibrate the camera
+              readings against a real lidar sensor as ground truth, but the lidar sensor
+              itself gave inconsistent readings run to run. The whole approach was replaced
+              with PhysX raycasting instead, which turned out to be cheaper, consistently
+              accurate, and effectively acts as a simulated lidar.
+            </p>
+
+            <div class="video-block">
+              <div class="video-frame">
+                <span class="viewport-tag">Perspective</span>
+                <video controls preload="metadata">
+                  <source src="videos/perspective-view.mp4" type="video/mp4">
+                </video>
+              </div>
+              <p class="video-caption">Debug view of the camera field-of-view setup from when cameras still handled ranging, before PhysX replaced them.</p>
+            </div>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">07</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+            <h3>Cargo dropping mid-carry</h3>
+            <p>
+              An object falling off mid-carry was a recurring bug that took several rounds to
+              actually solve. The first guess was that the robot's heading drifted slightly
+              off course over the drive, and the object slowly slid off as a result. That was
+              wrong. Testing showed the object fell almost immediately, within a few seconds
+              of starting to move, which pointed to something happening right at the start of
+              the drive, not a slow drift.
+            </p>
+            <p>
+              A separate bug, where the robot stopped in the wrong spot, was first assumed to
+              be caused by the same attachment problem, but turned out to be an unrelated bug
+              in the stop-condition logic.
+            </p>
+            <p>
+              The real cause of the drop was the robot accelerating at full speed the instant
+              it started moving from a dead stop, right after a lift. Lighter objects
+              couldn't stay seated on the plate through that kind of jolt. The fix scaled how
+              gently the robot accelerated based on the real weight of whatever it was
+              carrying, easing lighter objects into motion more gently while leaving heavier
+              ones on the original fast ramp. That fix relied on reading each object's real
+              mass directly from the simulation.
+            </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="status">
+        <h2>Current status</h2>
+
+        <div class="status-grid">
+          <div class="status-text">
+            <p>
+              Right now the robot moves objects one at a time from one shelf to another on its own.
+              It can plan around obstacles ahead of time, and reacts on the spot if one appears
+              without warning.
+            </p>
+            <p>
+              Main sensing is done using PhysX, as a way to imitate lidar without being too
+              expensive. Lidar itself was tested in an earlier session, but was opted out due to
+              memory cost.
+            </p>
+            <p>
+              Navigation is primarily driven using Nav2, moving between a sequence of waypoints.
+              Nav2's default driving behaviour curved instead of going straight, so a custom
+              controller was built on top of it that treats turning and driving as separate steps,
+              turning fully to face a heading before it starts moving. There's also a debug view
+              showing the current waypoints and stop zones.
+            </p>
+            <p><strong>Next steps:</strong></p>
+            <ul>
+              <li>Camera-based shelf identification</li>
+              <li>Robot-to-robot cooperation for heavier objects</li>
+              <li>Developing the environment into something closer to an actual warehouse</li>
+              <li>AI implementation, direction still undecided, possibly around how the robot judges where to place an unusual or oddly shaped object</li>
+              <li>Adding shelves with multiple height levels</li>
+            </ul>
+            <p><strong>Longer-term maybes:</strong></p>
+            <ul>
+              <li>Redesigning the warehouse, shelves, and robots to be more physically realistic (the robot's platform currently floats rather than sitting on real wheels or suspension)</li>
+              <li>A shelf layout designed around maximizing either space or speed</li>
+              <li>Building a real physical robot for testing outside simulation (might end up doing this earlier for fun)</li>
+            </ul>
+          </div>
+          <div class="status-videos">
+            <div class="video-block">
+              <div class="video-frame">
+                <span class="viewport-tag">Perspective</span>
+                <video controls preload="metadata">
+                  <source src="videos/obstacle-proactive-long.mp4" type="video/mp4">
+                </video>
+              </div>
+              <p class="video-caption">Planning around an obstacle ahead of time, sped up 2x.</p>
+            </div>
+            <div class="video-block">
+              <div class="video-frame">
+                <span class="viewport-tag">Perspective</span>
+                <video controls preload="metadata">
+                  <source src="videos/obstacle-reactive-close.mp4" type="video/mp4">
+                </video>
+              </div>
+              <p class="video-caption">Reacting to an obstacle that appears close-range, sped up 3x.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section ack reveal" id="acknowledgements">
+        <h2>Acknowledgements &amp; tools</h2>
+        <p>
+          NeuroWare's physical design is grounded in Yadav et al., <em>&ldquo;Maintaining the
+          Level of a Payload carried by Multi-Robot System on Irregular Surface&rdquo;</em>.
+          The reference actuator is a centred piston lift with a ball-joint contact plate that
+          conforms to angled surfaces, on a skid-steer base.
+        </p>
+        <p>
+          Getting that design to actually work for a warehouse pick-and-carry task took real
+          adaptation. The piston needed real position control, not damping, to hold a static
+          load under gravity. Damping alone only resists motion, not weight. A joint-offset
+          bug meant the platform couldn't reach far enough down to slide under a shelf object;
+          fixing it closed a 22cm gap to 6cm. The lift force itself needed empirical retuning.
+          It's calibrated so three of four payload objects can be lifted solo, and the heaviest
+          requires two robots working together. That turned a physics constraint into the
+          reason the swarm coordination exists at all.
+        </p>
+        <p class="tools">
+          Built with Pygame (2D prototype and transport simulation), ROS2 and Nav2 (navigation
+          and obstacle avoidance), NVIDIA Isaac Sim, using Omniverse Kit and PhysX (physics
+          simulation and robot control), Pixar USD (scene/asset description), and NumPy.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div><a href="index.html">&larr; Back to portfolio</a></div>
+  </footer>
+
+  <script>
+    (function () {
+      var links = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+      var sections = links.map(function (a) {
+        return document.getElementById(a.getAttribute('href').slice(1));
+      });
+
+      function onScroll() {
+        var pos = window.scrollY + 120;
+        var current = sections[0];
+        sections.forEach(function (sec) {
+          if (sec && sec.offsetTop <= pos) current = sec;
+        });
+        links.forEach(function (a) {
+          a.classList.toggle('active', current && a.getAttribute('href') === '#' + current.id);
+        });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      } else if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+      } else {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    })();
+  </script>
+
+</body>
+</html>

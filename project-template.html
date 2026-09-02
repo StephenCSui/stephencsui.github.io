@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>[PROJECT NAME] | Stephen Suiwinata</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /*
+      Reusable project-page design system (first built for neuroware.html).
+      Dark "sim viewport" theme + warehouse hazard-yellow / telemetry-cyan
+      two-accent system. Sidebar nav + wide content column instead of a
+      centered readme-style single column.
+
+      To reuse for a new project:
+        1. Copy this file to <project>.html next to index.html.
+        2. Fill in every [BRACKETED PLACEHOLDER].
+        3. Drop real clips in a ./videos/ folder next to the new page.
+        4. Add a nav link to it from index.html.
+    */
+    :root {
+      --bg: #14181c;
+      --panel: #1c2126;
+      --ink: #e9ecea;
+      --muted: #9ba5aa;
+      --line: #2b3238;
+      --hazard: #f4b52c;
+      --telemetry: #4fd1c5;
+      --max: 1440px;
+      --rail: 232px;
+      --display: "Big Shoulders Display", Impact, sans-serif;
+      --sans: "IBM Plex Sans", Arial, Helvetica, sans-serif;
+      --mono: "IBM Plex Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 1.08rem;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    a { color: var(--telemetry); }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--telemetry); outline-offset: 3px; }
+
+    p { margin: 0 0 1em; max-width: 68ch; }
+    h1, h2, h3 { margin: 0; }
+
+    /* ---- layout shell ---- */
+    .layout {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 28px 32px 60px;
+      display: flex;
+      align-items: flex-start;
+      gap: 48px;
+    }
+
+    .sidenav {
+      position: sticky;
+      top: 28px;
+      width: var(--rail);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .sidenav .brand-block .brand {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 1.7rem;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .sidenav .brand-block a.back {
+      display: inline-block;
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .brand-block a.back:hover { color: var(--telemetry); }
+
+    .sidenav nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+    .sidenav nav a {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.94rem;
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 0 7px 14px;
+      border-left: 2px solid var(--line);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .sidenav nav a:hover { color: var(--ink); }
+    .sidenav nav a.active { color: var(--telemetry); border-left-color: var(--telemetry); }
+
+    .sidenav .rail-links { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .sidenav .rail-links a {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sidenav .rail-links a:hover { color: var(--telemetry); }
+
+    .content { flex: 1; min-width: 0; }
+
+    .section { padding: 56px 0; border-top: 1px solid var(--line); }
+    .section:first-of-type { border-top: none; padding-top: 0; }
+
+    h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      font-size: clamp(1.8rem, 2.9vw, 2.4rem);
+      margin-bottom: 22px;
+    }
+
+    /* ---- hero ---- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--telemetry);
+      background: rgba(79, 209, 197, 0.08);
+      border: 1px solid rgba(79, 209, 197, 0.28);
+      padding: 5px 12px;
+      border-radius: 3px;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+    .badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--telemetry);
+      box-shadow: 0 0 6px var(--telemetry);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .badge .dot { animation: pulse 2.4s ease-in-out infinite; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: clamp(3rem, 5.6vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 44px;
+      align-items: center;
+    }
+    .hero-text p { max-width: 46ch; color: var(--ink); font-size: 1.05rem; }
+
+    /* ---- video viewport-frame signature ---- */
+    .video-block { margin: 18px 0; }
+    .video-frame { position: relative; }
+    .video-frame video {
+      display: block;
+      width: 100%;
+      border-radius: 2px;
+      background: #000;
+    }
+    .corner {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--telemetry);
+    }
+    .corner.tl { top: -7px; left: -7px; border-right: none; border-bottom: none; }
+    .corner.tr { top: -7px; right: -7px; border-left: none; border-bottom: none; }
+    .corner.bl { bottom: -7px; left: -7px; border-right: none; border-top: none; }
+    .corner.br { bottom: -7px; right: -7px; border-left: none; border-top: none; }
+    .video-caption {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 10px;
+      max-width: none;
+    }
+
+    /* ---- timeline: multi-era grid ----
+       nth-child(N) columns can be uneven (e.g. 1fr 1fr 1.4fr) if one era's
+       list is much longer than the others -- see neuroware.html history. */
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-bottom: 32px;
+    }
+    .phase h3 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--ink);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--telemetry);
+    }
+    .timeline-grid .phase ol {
+      margin: 0;
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+      margin-left: 2px;
+    }
+    .timeline-grid .phase li {
+      margin-bottom: 12px;
+      padding-left: 6px;
+      font-size: 1.02rem;
+      color: var(--muted);
+    }
+    .timeline-grid .phase li.milestone {
+      font-weight: 600;
+      color: var(--hazard);
+    }
+    .timeline-note { max-width: none; color: var(--muted); margin-bottom: 32px; }
+    #capabilities p { max-width: none; }
+
+    /* ---- difficulties: single-column log ----
+       Use this instead of a card grid -- items are rarely equal length,
+       and a symmetric grid just produces awkward empty space. */
+    .difficulties-log {
+      display: flex;
+      flex-direction: column;
+    }
+    .difficulties-log .phase {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 32px;
+      padding: 36px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .difficulties-log .phase:first-child { padding-top: 0; }
+    .difficulties-log .phase:last-child { border-bottom: none; padding-bottom: 0; }
+    .difficulties-log .phase-index {
+      font-family: var(--mono);
+      color: var(--hazard);
+    }
+    .difficulties-log .phase-index .num {
+      display: block;
+      font-size: 2.1rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .difficulties-log .phase-index .eyebrow {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .difficulties-log .phase h3 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 14px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .difficulties-log .phase p { color: var(--muted); max-width: 72ch; }
+    .difficulties-log .phase p:last-child { margin-bottom: 0; }
+    .difficulties-log .video-block { max-width: 72ch; }
+
+    /* ---- current status: prose, then full-width videos ---- */
+    .status-videos {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 28px;
+    }
+    .status-text p { max-width: none; }
+    .status-grid ul { padding-left: 20px; max-width: none; color: var(--muted); }
+    .status-grid li { margin-bottom: 8px; }
+    .status-grid strong {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--telemetry);
+      margin-bottom: 8px;
+    }
+
+    .ack p { color: var(--muted); max-width: none; }
+    .ack p.tools { font-size: 1rem; }
+
+    footer {
+      max-width: var(--max);
+      margin-left: clamp(24px, 5vw, 120px);
+      margin-right: auto;
+      padding: 30px 32px 50px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-family: var(--mono);
+    }
+
+    /* ---- reveal on scroll ---- */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .reveal.is-visible { opacity: 1; transform: none; }
+    }
+
+    /* ---- responsive ---- */
+    @media (max-width: 960px) {
+      .layout, footer { margin-left: auto; }
+      .layout { flex-direction: column; padding: 20px 24px 48px; gap: 28px; }
+      .sidenav {
+        position: static;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .sidenav nav ul { flex-direction: row; flex-wrap: wrap; gap: 4px 16px; }
+      .sidenav nav a { border-left: none; border-bottom: 2px solid var(--line); padding: 4px 0; }
+      .sidenav nav a.active { border-left: none; border-bottom-color: var(--telemetry); }
+      .sidenav .rail-links { flex-direction: row; gap: 18px; border-top: none; padding-top: 0; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .timeline-grid { grid-template-columns: 1fr; }
+      .difficulties-log .phase { grid-template-columns: 1fr; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidenav">
+      <div class="brand-block">
+        <div class="brand">[Project Name]</div>
+        <a class="back" href="index.html">&larr; Portfolio</a>
+      </div>
+      <nav aria-label="Section navigation">
+        <ul>
+          <li><a href="#hero" data-nav>Overview</a></li>
+          <li><a href="#timeline" data-nav>Timeline</a></li>
+          <li><a href="#difficulties" data-nav>Difficulties</a></li>
+          <li><a href="#status" data-nav>Status</a></li>
+          <li><a href="#acknowledgements" data-nav>Acknowledgements</a></li>
+        </ul>
+      </nav>
+      <div class="rail-links">
+        <a href="[GITHUB REPO URL]" target="_blank" rel="noopener">GitHub &#8599;</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="section" id="hero">
+        <div class="hero-grid">
+          <div class="hero-text">
+            <div class="badge"><span class="dot"></span>[STATUS BADGE, e.g. Milestone 1 &middot; DATE &middot; Confirmed]</div>
+            <h1>[Project Name]</h1>
+            <p>
+              [1 short paragraph: what this project is and why you built it. Keep it
+              personal/first-person, matching the rest of the site's voice -- see the
+              feedback_neuroware_writing_voice memory: short, blunt sentences, no
+              marketing flourish.]
+            </p>
+          </div>
+          <div class="video-block">
+            <div class="video-frame">
+              <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+              <video controls autoplay muted loop playsinline preload="auto">
+                <source src="videos/[hero-demo].mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="video-caption">[What this clip shows, and its speed-up factor if any.]</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="capabilities">
+        <h2>What it does now</h2>
+        <p>
+          [1 paragraph describing current real capability. No invented claims --
+          only what's actually working today.]
+        </p>
+      </section>
+
+      <section class="section reveal" id="timeline">
+        <h2>Timeline</h2>
+
+        <p class="timeline-note">
+          [Optional: 1 paragraph framing pivots/direction changes, if any happened.
+          Sits above the grid so it reads as context for all eras, not a trailing
+          note under whichever column happens to be longest.]
+        </p>
+
+        <div class="timeline-grid">
+          <div class="phase">
+            <h3>[Era 1 name] [(abandoned) if applicable]</h3>
+            <ol>
+              <li>[Session summary line.]</li>
+              <li>[Session summary line.]</li>
+            </ol>
+          </div>
+
+          <div class="phase">
+            <h3>[Era 2 name]</h3>
+            <ol>
+              <li>[Session summary line.]</li>
+            </ol>
+          </div>
+
+          <div class="phase">
+            <h3>[Era 3 name (current line)]</h3>
+            <ol>
+              <li>[Session summary line.]</li>
+              <li class="milestone">[Milestone line, if any -- gets hazard-yellow + bold.]</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" id="difficulties">
+        <h2>Difficulties</h2>
+
+        <div class="difficulties-log">
+          <div class="phase">
+            <div class="phase-index">
+              <span class="num">01</span>
+              <span class="eyebrow">Failure log</span>
+            </div>
+            <div class="phase-body">
+              <h3>[What broke]</h3>
+              <p>
+                [The failure, why the first fix attempt didn't work if applicable,
+                and what the real fix was. Keep the "this failed, so we tried X"
+                arc -- that's what makes these worth reading. Fact-check every
+                claim against the project's own logs before writing it.]
+              </p>
+              <!-- Add more <p> tags here for longer write-ups (see
+                   neuroware.html's "Migrating to Nav2" item, 5 paragraphs).
+                   Add a .video-block here too if there's a supporting clip
+                   (see neuroware.html's PhysX-ranging item). -->
+            </div>
+          </div>
+
+          <!-- Repeat the .phase block above for each difficulty, incrementing
+               the <span class="num"> (01, 02, 03...). Don't force these into
+               a card grid -- they're rarely equal length, and a symmetric
+               grid just produces awkward empty space (learned the hard way
+               on neuroware.html). -->
+        </div>
+      </section>
+
+      <section class="section reveal" id="status">
+        <h2>Current status</h2>
+
+        <div class="status-grid">
+          <div class="status-text">
+            <p>
+              [What works right now, in plain terms.]
+            </p>
+            <p><strong>Next steps:</strong></p>
+            <ul>
+              <li>[Near-term planned work.]</li>
+            </ul>
+            <p><strong>Longer-term maybes:</strong></p>
+            <ul>
+              <li>[Things you might do eventually but aren't committed to.]</li>
+            </ul>
+          </div>
+          <div class="status-videos">
+            <div class="video-block">
+              <div class="video-frame">
+                <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+                <video controls preload="metadata">
+                  <source src="videos/[status-demo].mp4" type="video/mp4">
+                </video>
+              </div>
+              <p class="video-caption">[Caption.]</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section ack reveal" id="acknowledgements">
+        <h2>Acknowledgements &amp; tools</h2>
+        <p>
+          [Any reference papers/designs this project is grounded in, and how
+          it had to be adapted for real use -- see neuroware.html's Yadav et
+          al. paragraph for the pattern.]
+        </p>
+        <p class="tools">
+          Built with [tool 1] ([what it's for]), [tool 2] ([what it's for]).
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div><a href="index.html">&larr; Back to portfolio</a></div>
+  </footer>
+
+  <script>
+    (function () {
+      var links = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+      var sections = links.map(function (a) {
+        return document.getElementById(a.getAttribute('href').slice(1));
+      });
+
+      function onScroll() {
+        var pos = window.scrollY + 120;
+        var current = sections[0];
+        sections.forEach(function (sec) {
+          if (sec && sec.offsetTop <= pos) current = sec;
+        });
+        links.forEach(function (a) {
+          a.classList.toggle('active', current && a.getAttribute('href') === '#' + current.id);
+        });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      } else if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+      } else {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    })();
+  </script>
+
+</body>
+</html>

@@ -341,32 +341,26 @@
     .logo-link {
       width: 100%;
       max-width: 220px;
-      min-height: 140px;
       margin: 0 auto 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px dashed rgba(255,255,255,0.24);
-      border-radius: 16px;
-      background: rgba(255,255,255,0.03);
-      color: var(--muted);
-      font-weight: 700;
       text-align: center;
-      padding: 16px;
     }
 
     .logo-link img {
-      max-width: 140px;
-      max-height: 100px;
+      max-width: 180px;
+      max-height: 180px;
       width: 100%;
       height: auto;
       object-fit: contain;
+      border-radius: 12px;
       margin: 0 auto;
     }
 
     .logo-link:hover {
       text-decoration: none;
-      background: rgba(255,255,255,0.06);
+      opacity: 0.85;
     }
 
     .reflection-photo {
@@ -404,6 +398,82 @@
       font-size: 0.95rem;
       margin-top: 10px;
       text-align: center;
+    }
+
+    .reflection-photo.is-compact img,
+    .reflection-photo.is-compact .photo-placeholder {
+      max-width: 420px;
+    }
+
+    .reflection-photo-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 26px 0 28px;
+    }
+
+    .reflection-photo-row .reflection-photo {
+      margin: 0;
+      flex: 1 1 300px;
+      max-width: 360px;
+    }
+
+    .reflection-photo-row .reflection-photo img {
+      max-width: 100%;
+      height: 260px;
+      object-fit: cover;
+    }
+
+    #projects .container { width: min(1440px, calc(100% - 32px)); }
+    #projects .content { max-width: none; }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      margin-top: 8px;
+    }
+
+    .project-card {
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .project-thumb {
+      margin: -26px -26px 0;
+      width: calc(100% + 52px);
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .project-card h3 {
+      margin-bottom: 0;
+    }
+
+    .project-card p {
+      color: var(--muted);
+      font-size: 1.02rem;
+      margin: 0;
+    }
+
+    .project-card .project-tools {
+      font-size: 0.88rem;
+      color: var(--accent);
+    }
+
+    .project-card .project-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
     }
 
     .contact-grid {
@@ -485,6 +555,7 @@
       <nav class="nav-links">
         <a href="#home">Home</a>
         <a href="#about">About</a>
+        <a href="#projects">Projects</a>
         <a href="#resume">Resume</a>
         <a href="#reflection">Reflection</a>
         <a href="#contact">Contact</a>
@@ -559,6 +630,66 @@
               while growing into team leadership. Long term, I want to be someone who can move fluently
               between the engineering and the people side of a project.
             </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="content">
+          <h2 class="section-title">Projects</h2>
+          <p class="section-intro">
+            Personal and team robotics builds, with full write-ups covering what worked,
+            what didn't, and why.
+          </p>
+
+          <div class="projects-grid">
+            <div class="project-card">
+              <img class="project-thumb" src="thumb-neuroware.jpg" alt="NeuroWare Isaac Sim viewport">
+              <h3>NeuroWare</h3>
+              <p>
+                Personal project built on Isaac Sim and ROS2 Nav2. A warehouse robot
+                that picks up and carries objects between shelves, with multi-robot
+                cooperation planned for objects too heavy for one robot alone.
+              </p>
+              <div class="project-tools">Isaac Sim &middot; ROS2 &middot; Nav2 &middot; Pygame</div>
+              <div class="project-links">
+                <a class="btn btn-primary" href="neuroware.html">View Project</a>
+                <a class="btn" href="https://github.com/StephenCSui/NeuroWare" target="_blank" rel="noopener noreferrer">GitHub</a>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <img class="project-thumb" src="thumb-xr-teleoperation.jpg" alt="VR headset controlling the real UR3 arm">
+              <h3>XR Teleoperation</h3>
+              <p>
+                University group project. A Meta Quest 2 controller drives a real UR3
+                robot arm over ROS2, translating hand movement in Unity into drawn
+                strokes on a physical canvas.
+              </p>
+              <div class="project-tools">ROS2 &middot; MoveIt Servo &middot; Unity &middot; Meta Quest 2</div>
+              <div class="project-links">
+                <a class="btn btn-primary" href="xr-teleoperation.html">View Project</a>
+                <a class="btn" href="https://github.com/StephenCSui/XR_Teleoperation" target="_blank" rel="noopener noreferrer">GitHub (ROS)</a>
+                <a class="btn" href="https://github.com/StephenCSui/XR-Teleoperation-Unity" target="_blank" rel="noopener noreferrer">GitHub (Unity)</a>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <img class="project-thumb" src="thumb-air2-manipulation.jpg" alt="Franka arm reaching a pegboard in Isaac Sim">
+              <h3>AIR2 Manipulation</h3>
+              <p>
+                University group project. A Franka arm finds tools on a pegboard with a
+                segmentation CNN and sorts them into a basket using per-tool policies
+                trained through Isaac Lab's Mimic pipeline and behavior cloning.
+              </p>
+              <div class="project-tools">Isaac Sim &middot; Isaac Lab Mimic &middot; PyTorch &middot; Behavior Cloning</div>
+              <div class="project-links">
+                <a class="btn btn-primary" href="air2-manipulation.html">View Project</a>
+                <a class="btn" href="https://github.com/Kaung-dev/AI_Robot_Manipulation_UR3e" target="_blank" rel="noopener noreferrer">GitHub</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -726,7 +857,7 @@
             </p>
           </div>
 
-          <figure class="reflection-photo">
+          <figure class="reflection-photo is-compact">
             <img src="fullteam.jpg" alt="Team photo from internship">
             <figcaption>Internship team and industry environment.</figcaption>
           </figure>
@@ -792,10 +923,16 @@
             </p>
           </div>
 
-          <figure class="reflection-photo">
-            <img src="20260212_165554.jpg" alt="Internship showcase or final presentation photo">
-            <figcaption>Showcase or final outcome from the internship experience.</figcaption>
-          </figure>
+          <div class="reflection-photo-row">
+            <figure class="reflection-photo">
+              <img src="20260212_165554.jpg" alt="Internship showcase or final presentation photo">
+              <figcaption>Showcase or final outcome from the internship experience.</figcaption>
+            </figure>
+            <figure class="reflection-photo">
+              <img src="handover-nanosonics.jpg" alt="Team handing the project over at the Nanosonics office">
+              <figcaption>Handing the project over at the Nanosonics office.</figcaption>
+            </figure>
+          </div>
 
           <div class="reflection-block">
             <h3>Future Direction</h3>
